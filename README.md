@@ -4,7 +4,7 @@
 
 - **仓库**：[angussleeping/tampermonkey-scripts](https://github.com/angussleeping/tampermonkey-scripts)
 - **脚本数量**：14 个（12 个第三方 / 2 个自有）
-- **最近同步**：2026-11-23（首次每周闭环）
+- **最近同步**：2026-11-23
 
 ---
 
@@ -32,16 +32,19 @@
   └─ 6. 篡改猴通过 @updateURL 检测到新版本 → 自动更新到本地
 ```
 
-**关于「优化」的边界（重要）**：第三方大型脚本（如 Bilibili Evolved、LinkSwift、CSDNGreener）是作者长期维护的成熟项目，
-随意改动其逻辑极易破坏功能，因此本仓库对它们**保持代码主体零改动**，优化集中在「同步上游最新版 + 元数据与依赖层面的非破坏性检查」，
-且每次改动都会记入 CHANGELOG。实质性优化只作用于自有脚本。
+**关于「优化」的边界（重要）**：
+
+- **大型脚本（> 200 KiB）完全不做改动**，只跟随作者更新。当前适用：Bilibili Evolved（1429 KB）、LinkSwift（571 KB）。
+- 其余第三方脚本**代码主体零改动**，优化仅限元数据层面的实证修复：失效依赖地址、缺失的 `@grant` 声明、不安全的资源地址。
+- 每项改动都必须可外部验证（HTTP 状态码、具体代码行号），并记录在 `tools/optimizations.json` 与 CHANGELOG。
+- 优化以声明式补丁表保存，重建时自动重放，不会因从篡改猴重新导出而丢失。
 
 ## 三、脚本总览
 
 | # | 脚本 | 作者 | 版本 | 分类 | 来源 |
 |---|------|------|------|------|------|
-| 1 | [GitHub Plus](#s1) | PRO-2684 | `0.7.1` | GitHub 增强 | 第三方 |
-| 2 | [AC-baidu-重定向优化百度搜狗谷歌必应搜索_favicon_双列](#s2) | AC | `27.20` | 搜索与跳转 | 第三方 |
+| 1 | [GitHub Plus](#s1) | PRO-2684 | `0.7.2` | GitHub 增强 | 第三方 |
+| 2 | [AC-baidu-重定向优化百度搜狗谷歌必应搜索_favicon_双列](#s2) | AC | `27.21` | 搜索与跳转 | 第三方 |
 | 3 | [网盘自动填写访问码【威力加强版】](#s3) | 极品小猫 | `3.25.41.2` | 下载工具 | 第三方 |
 | 4 | [Github Enhancement - High Speed Download](#s4) | X.I.U | `2.6.41` | GitHub 增强 | 第三方 |
 | 5 | [AutoPager](#s5) | X.I.U | `6.6.75` | 通用浏览增强 | 第三方 |
@@ -67,7 +70,7 @@
 |----|------|
 | 文件 | [`scripts/GitHub-Plus.user.js`](scripts/GitHub-Plus.user.js) |
 | 作者 | PRO-2684 |
-| 版本 | `0.7.1` |
+| 版本 | `0.7.2` |
 | 许可证 | gpl-3.0 |
 | 分类 | GitHub 增强 |
 | 匹配规则 | 2 条 `@match` / `@include` |
@@ -78,6 +81,11 @@
 **上游地址**：[项目/主页](https://greasyfork.org/scripts/510742) · [上游 meta](https://update.greasyfork.org/scripts/510742/GitHub%20Plus.meta.js)
 
 **本仓库处理**：代码主体原样归档，仅注入本仓库更新地址；后续由每周任务同步作者更新。
+
+**本次优化**（`0.7.1` → `0.7.2`，仅改元数据，代码主体零改动）：
+
+- `@icon` —— `http://github.com/favicon.ico` → `https://github.com/favicon.ico`。图标为明文 http，在 https 页面属混合内容，可能被浏览器阻止加载。
+- 补声明 `@grant GM_info` —— 脚本第 448 行使用 const { name, version } = GM_info.script，但 @grant 未声明 GM_info。
 
 **本仓库更新地址**：
 
@@ -94,7 +102,7 @@
 |----|------|
 | 文件 | [`scripts/AC-baidu-Redirect.user.js`](scripts/AC-baidu-Redirect.user.js) |
 | 作者 | AC |
-| 版本 | `27.20` |
+| 版本 | `27.21` |
 | 许可证 | GPL-3.0-only |
 | 分类 | 搜索与跳转 |
 | 匹配规则 | 16 条 `@match` / `@include` |
@@ -105,6 +113,11 @@
 **上游地址**：[项目/主页](https://greasyfork.org/zh-TW/scripts/14178) · [上游 meta](https://update.greasyfork.org/scripts/14178/AC-baidu-%E9%87%8D%E5%AE%9A%E5%90%91%E4%BC%98%E5%8C%96%E7%99%BE%E5%BA%A6%E6%90%9C%E7%8B%97%E8%B0%B7%E6%AD%8C%E5%BF%85%E5%BA%94%E6%90%9C%E7%B4%A2_favicon_%E5%8F%8C%E5%88%97.meta.js)
 
 **本仓库处理**：代码主体原样归档，仅注入本仓库更新地址；后续由每周任务同步作者更新。
+
+**本次优化**（`27.20` → `27.21`，仅改元数据，代码主体零改动）：
+
+- `@resource` `baiduLiteStyle` —— `https://gitcode.net/-/snippets/1906/raw/master/LiteStyle.css?inline=false` → `https://ibaidu.tujidu.com/newcss/baiduLiteStyle.less?t=27.20`。原地址实测 HTTP 404（GitCode 资源下线/迁移）。替代地址为作者自有服务器上同命名规律的等效资源：实测 HTTP 200、60226 字节、文件头标注 Title: baidu-lite、含 #wrapper/.c-container/.result 等百度页面选择器，与另外 22 个 @resource 同域名同版本参数。
+- 补声明 `@grant GM_info` —— 脚本第 405 行使用 GM_info.script.version，但 @grant 未声明 GM_info；在严格实现的管理器中该 API 不可用，会抛 TypeError。
 
 **本仓库更新地址**：
 
@@ -399,7 +412,7 @@
 
 **作用**：自动切到「最新微博」按实际时间排序；隐藏信息流中的「荐读」卡片并让下方微博上移补齐空位。
 
-**本仓库处理**：自有脚本，可直接做实质性优化与迭代。v1.0.1 起去除 1s / 4s 高频轮询，切换与隐藏改由 MutationObserver 事件驱动，仅保留 15s 低频兜底。
+**本仓库处理**：自有脚本，可直接做实质性优化与迭代；本次为当前优化后的版本。
 
 **本仓库更新地址**：
 
@@ -424,7 +437,7 @@
 
 **作用**：去掉知乎广告并提供沉浸模式（隐藏侧栏、主栏加宽）；与「知乎增强」脚本共存、功能互补。
 
-**本仓库处理**：自有脚本，可直接做实质性优化与迭代。v2.1.1 起样式注入改为幂等、菜单注册增加 API 存在性校验。
+**本仓库处理**：自有脚本，可直接做实质性优化与迭代；本次为当前优化后的版本。
 
 **本仓库更新地址**：
 
@@ -435,11 +448,60 @@
 
 ---
 
-## 五、更新日志
+## 五、依赖与元数据健康检查
+
+2026-11-23 对全部脚本做的实测（只读检查，不改代码逻辑）：
+
+| 检查项 | 覆盖范围 | 结果 |
+|--------|----------|------|
+| `@require` 外部依赖 | 15 条，涉及 7 个脚本 | 全部 HTTP 200，内容均为有效 JS，无 HTML 错误页 |
+| SRI 完整性哈希 | GitHub-Plus 的 `#sha256=` | 与实际内容一致，可正常加载 |
+| `@resource` 资源 | 25 条 | 24 条正常；1 条 404（AC-baidu 的 `baiduLiteStyle`，**已修复**） |
+| `@icon` 图标 | 8 条 | 7 条正常；1 条明文 `http`（GitHub-Plus，**已改 https**） |
+| `@version` 格式 | 14 个脚本 | 全部合法 |
+| `@grant` 声明完整性 | 14 个脚本 | 2 个脚本调用了未声明的 `GM_info`（**已补**）；其余声明齐全 |
+| 重复 `@match` / `@include` | 14 个脚本 | 无重复 |
+| 资源名与代码调用一致性 | AC-baidu 22 个 `@resource` | 全部匹配，无静默取不到的资源 |
+
+**已知但本次有意不处理**：
+
+- **LinkSwift**：同样使用 GM_info 未声明 @grant —— 脚本 571 KB，超过 200 KiB 阈值，按约定不做改动。
+- **CSDNGreener**：@require 的 jquery-cookie、nprogress 在代码中未检出使用 —— 检测方法存在假阴性风险（已在 AC-baidu 的 Vue 依赖上验证过误判），删除依赖收益（省 2 个请求）低于误删导致功能损坏的风险，按「保证功能完整」原则保留。
+
+**检查更新的流量优化**：`meta/*.meta.js` 只用于篡改猴比对 `@version`，已剔除 data URI 图标、`@resource`、`@note` 等与版本判断无关的字段。
+当前 14 个 meta 文件合计 **44.4 KB**（精简前约 100 KB），每次「检查更新」少下载约 60 KB。
+
+## 六、脚本共存与冲突排查
+
+**全站型脚本**（匹配所有站点，需特别注意相互作用）：`AutoPager`、`Skip-Progress-Bar`。
+
+以下站点会被多个脚本同时注入（由各脚本的 `@match` / `@include` 自动统计）：
+
+| 站点 | 同时生效的脚本 |
+|------|----------------|
+| `baidu.com` | AC-baidu-Redirect、Annoyances-Interception、LinkSwift、Universal-Downloader |
+| `github.com` | GitHub-Plus、GitHub-Zh-CN、Github-Enhancement-High-Speed-Download |
+| `quark.cn` | Annoyances-Interception、LinkSwift、Universal-Downloader |
+| `bilibili.com` | Annoyances-Interception、Bilibili-Evolved |
+| `csdn.net` | Annoyances-Interception、CSDNGreener |
+| `qq.com` | Annoyances-Interception、Universal-Downloader |
+| `so.com` | AC-baidu-Redirect、Universal-Downloader |
+| `zhihu.com` | Annoyances-Interception、Zhihu-AdClean-Focus |
+
+**排查建议**（出现异常时按此顺序定位，每次只改一项）：
+
+1. **全站型组合**：`AutoPager`（自动翻页）与 `Skip-Progress-Bar`（跳过进度条、改写链接跳转）都改导航行为，是唯一可能互相干扰的一对。若某些站点翻页失效或跳转异常，先临时禁用 `Skip-Progress-Bar` 验证。
+2. **通用拦截优先怀疑**：`Annoyances-Interception` 覆盖 67 条规则、命中大量站点。若某站点的正常元素被误删，优先禁用它定位。
+3. **GitHub 三件套**：`GitHub-Plus`、`GitHub-Zh-CN`、`Github-Enhancement` 都操作同一页面。界面错乱时按 `GitHub-Zh-CN` → `GitHub-Plus` → `Github-Enhancement` 顺序单独禁用定位。
+4. **同站同功能**：`zhihu.com` 上的 `Zhihu-AdClean-Focus` 与 `Annoyances-Interception`、`csdn.net` 上的 `CSDNGreener` 与 `Annoyances-Interception` 都属于"隐藏元素"类，通常互补；若布局异常再逐个排查。
+
+---
+
+## 七、更新日志
 
 见 [CHANGELOG.md](CHANGELOG.md)。
 
-## 六、致谢
+## 八、致谢
 
 本仓库只是托管与整理，**所有第三方脚本的著作权、许可与功劳完全归原作者所有**。
 衷心感谢以下作者（按脚本顺序）：

@@ -78,6 +78,17 @@ CATEGORIES = [
 # 自有脚本（由本会话 / WorkBuddy 产出，可做实质性优化）
 SELF_ORIGIN = {13, 14}  # 1-based 序号
 
+# 第三方脚本的非破坏性优化补丁（声明式，重建时自动重放，避免重新导出后丢失）
+OPT_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'optimizations.json')
+try:
+    _OPT = json.load(open(OPT_PATH, encoding='utf-8'))
+except Exception:
+    _OPT = {}
+OPT_PATCHES = _OPT.get('patches', {})
+META_SLIM = _OPT.get('meta_slim', {})
+OPT_POLICY = _OPT.get('policy', {})
+LARGE_THRESHOLD = int(OPT_POLICY.get('large_script_threshold_bytes', 204800))
+
 
 def meta_values(block, key):
     return [v.strip() for v in re.findall(r'^\s*//\s*@' + re.escape(key) + r'\s+(.+)$', block, re.M)]
@@ -132,7 +143,7 @@ def detect_newline(lines):
 
 
 def patch_code(code, slug, upstream_meta, upstream_download, file_url):
-    """只改元数据块：替换 updateURL/downloadURL，规范 version，追加来源注释。"""
+    """只改元数据块：替换 updateURL/downloadURL、应用优化补丁、规范/提升 version、追加来源注释。"""
     lines = code.splitlines(keepends=True)
     nl = detect_newline(lines)
     try:
@@ -141,9 +152,16 @@ def patch_code(code, slug, upstream_meta, upstream_download, file_url):
     except StopIteration:
         return code, {}
 
+    opt = OPT_PATCHES.get(slug, {}) or {}
+    reps = opt.get('replace_meta', []) or []
+    add_grants = [g for g in (opt.get('add_grant') or []) if g]
+
     orig_update = ""
     orig_download = ""
     version_changed = None
+    version_bumped_from = ""
+    applied = []
+    grants = set()
     out = []
     for idx, raw in enumerate(lines):
         content = raw.rstrip('\r\n')
@@ -151,6 +169,8 @@ def patch_code(code, slug, upstream_meta, upstream_download, file_url):
             m = re.match(r'^(\s*//\s*@)(\w[\w:-]*)(\s+)(.+)$', content)
             if m:
                 key, value = m.group(2), m.group(4).strip()
+                if key == 'grant':
+                    grants.add(value)
                 if key in ('updateURL', 'downloadURL'):
                     if key == 'updateURL':
                         orig_update = value
@@ -158,12 +178,57 @@ def patch_code(code, slug, upstream_meta, upstream_download, file_url):
                         orig_download = value
                     continue  # 删除原行，稍后统一替换
                 if key == 'version':
+                    bumped = (opt.get('version_bump') or '').strip()
+                    if bumped and bumped != value:
+                        version_bumped_from = value
+                        out.append(m.group(1) + key + m.group(3) + bumped + nl)
+                        continue
                     nv = norm_version(value)
                     if nv != value:
                         version_changed = (value, nv)
                         out.append(m.group(1) + key + m.group(3) + nv + nl)
                         continue
+                # 应用元数据替换补丁（@resource / @icon 等）
+                hit = None
+                for rep in reps:
+                    if key != rep.get('field'):
+                        continue
+                    want_name = rep.get('name')
+                    if want_name:
+                        mm = re.match(r'^(\S+)(\s+)(\S.*?)\s*$', value)
+                        if not mm or mm.group(1) != want_name:
+                            continue
+                        if mm.group(3).strip() != rep.get('old', '').strip():
+                            continue
+                        newline = m.group(1) + key + m.group(3) + mm.group(1) + mm.group(2) + rep['new']
+                    else:
+                        if value != rep.get('old', '').strip():
+                            continue
+                        newline = m.group(1) + key + m.group(3) + rep['new']
+                    hit = rep
+                    out.append(newline + nl)
+                    break
+                if hit:
+                    applied.append({
+                        'field': hit.get('field'),
+                        'name': hit.get('name', ''),
+                        'old': hit.get('old', ''),
+                        'new': hit.get('new', ''),
+                        'reason': hit.get('reason', ''),
+                    })
+                    continue
         if idx == end:
+            # 补声明缺失的 @grant（仅增不减，不触碰已有声明）
+            for g in add_grants:
+                if g not in grants:
+                    out.append('// @grant        ' + g + nl)
+                    applied.append({
+                        'field': 'grant',
+                        'name': g,
+                        'old': '(未声明)',
+                        'new': g,
+                        'reason': opt.get('grant_reason', ''),
+                    })
             fn = slug + '.user.js'
             meta_fn = slug + '.meta.js'
             inject = [
@@ -181,8 +246,30 @@ def patch_code(code, slug, upstream_meta, upstream_download, file_url):
         'orig_updateURL': orig_update,
         'orig_downloadURL': orig_download,
         'version_changed': version_changed,
+        'version_bumped_from': version_bumped_from,
+        'applied': applied,
     }
     return ''.join(out), info
+
+
+def slim_meta(meta_text, cfg):
+    """精简 meta.js：仅保留版本判断所需字段，剔除 data URI 图标与 @resource/@note 等大字段。"""
+    if not cfg.get('enabled'):
+        return meta_text
+    drop = set(cfg.get('drop_fields', []) or [])
+    drop_data_icon = bool(cfg.get('drop_data_uri_icon'))
+    out = []
+    for raw in meta_text.splitlines(keepends=True):
+        c = raw.rstrip('\r\n')
+        m = re.match(r'^(\s*//\s*@)(\w[\w:-]*)(\s+)(.*)$', c)
+        if m:
+            key, val = m.group(2), m.group(4).strip()
+            if key in drop:
+                continue
+            if drop_data_icon and key == 'icon' and val.startswith('data:'):
+                continue
+        out.append(raw)
+    return ''.join(out)
 
 
 def build(export_path, root):
@@ -197,6 +284,7 @@ def build(export_path, root):
     os.makedirs(meta_dir, exist_ok=True)
 
     manifest = []
+    per_matches = {}
     for i, s in enumerate(scripts):
         n = i + 1
         slug = SLUGS[i] if i < len(SLUGS) else ('script-%02d' % n)
@@ -226,19 +314,23 @@ def build(export_path, root):
         mb = re.search(r'// ==UserScript==.*?// ==/UserScript==', patched, re.S)
         meta_text = mb.group(0) if mb else patched
         mnl = '\r\n' if '\r\n' in meta_text else '\n'
+        slimmed = slim_meta(meta_text, META_SLIM)
+        meta_bytes = (slimmed.rstrip('\r\n') + mnl).encode('utf-8')
         with open(os.path.join(meta_dir, meta_fn), 'wb') as f:
-            f.write((meta_text.rstrip('\r\n') + mnl).encode('utf-8'))
+            f.write(meta_bytes)
 
         upstream_meta = info['orig_updateURL'] or old_update
         upstream_download = info['orig_downloadURL'] or old_download or file_url
         upstream_page = derive_homepage(homepage, [old_update, old_download, file_url])
 
+        per_matches[slug] = matches
         manifest.append({
             'file': fn,
             'meta_file': meta_fn,
             'name': name.strip(),
             'author': author.strip(),
-            'version': norm_version(version),
+            'version': norm_version(version) if not info['version_bumped_from'] else (
+                (OPT_PATCHES.get(slug, {}) or {}).get('version_bump', norm_version(version))),
             'original_version': version.strip(),
             'license': license_.strip(),
             'category': CATEGORIES[i] if i < len(CATEGORIES) else '其他',
@@ -246,6 +338,7 @@ def build(export_path, root):
             'origin': 'self' if n in SELF_ORIGIN else 'third_party',
             'enabled': bool(s.get('enabled', True)),
             'size_bytes': len(patched.encode('utf-8')),
+            'meta_bytes': len(meta_bytes),
             'upstream_meta': upstream_meta.strip(),
             'upstream_download': upstream_download.strip(),
             'upstream_page': upstream_page.strip(),
@@ -254,6 +347,10 @@ def build(export_path, root):
             'match_count': len(matches),
             'namespace': first(block, 'namespace', '').strip(),
             'version_normalized': bool(info['version_changed']),
+            'version_bumped_from': info['version_bumped_from'],
+            'optimized': bool(info['applied']),
+            'optimizations': info['applied'],
+            'oversize': len(patched.encode('utf-8')) > LARGE_THRESHOLD,
         })
         print('  [%2d] %-48s %-12s %8d bytes' % (n, fn, manifest[-1]['version'], manifest[-1]['size_bytes']))
 
@@ -266,6 +363,8 @@ def build(export_path, root):
         'export_source': os.path.basename(export_path),
         'generated_at': datetime.date.today().isoformat(),
         'script_count': len(manifest),
+        'large_script_threshold_bytes': LARGE_THRESHOLD,
+        'site_overlaps': compute_overlaps(per_matches),
         'scripts': manifest,
     }
     with open(os.path.join(root, 'scripts-manifest.json'), 'w', encoding='utf-8', newline='\n') as f:
@@ -274,6 +373,41 @@ def build(export_path, root):
     write_readme(root, manifest_doc)
     write_changelog(root, manifest_doc)
     return manifest_doc
+
+
+def site_of(pattern):
+    """从 @match/@include 规则粗略提取主域名，用于统计脚本共存情况。"""
+    m = re.search(r'://([^/]+)/', (pattern or '').strip())
+    if not m:
+        return None
+    h = m.group(1).replace('*.', '').replace('*', '')
+    parts = [x for x in h.split('.') if x]
+    if not parts:
+        return None
+    if len(parts) >= 3 and parts[-2] in ('com', 'net', 'org', 'gov', 'edu'):
+        return '.'.join(parts[-3:])
+    if len(parts) >= 2:
+        return '.'.join(parts[-2:])
+    return parts[0]
+
+
+def compute_overlaps(per_script_matches):
+    """找出被 2 个以上脚本同时覆盖的站点，以及全站型脚本。"""
+    site_map = {}
+    wildcard = []
+    for slug, pats in per_script_matches.items():
+        for p in pats:
+            ps = (p or '').strip()
+            if ps in ('*://*/*', 'http://*/*', 'https://*/*', '*://*'):
+                if slug not in wildcard:
+                    wildcard.append(slug)
+                continue
+            s = site_of(ps)
+            if s:
+                site_map.setdefault(s, set()).add(slug)
+    overlaps = [{'site': s, 'scripts': sorted(v)} for s, v in site_map.items() if len(v) > 1]
+    overlaps.sort(key=lambda x: (-len(x['scripts']), x['site']))
+    return {'wildcard': sorted(wildcard), 'overlaps': overlaps}
 
 
 def write_readme(root, doc):
@@ -315,9 +449,12 @@ def write_readme(root, doc):
     L.append('  └─ 6. 篡改猴通过 @updateURL 检测到新版本 → 自动更新到本地')
     L.append('```')
     L.append('')
-    L.append('**关于「优化」的边界（重要）**：第三方大型脚本（如 Bilibili Evolved、LinkSwift、CSDNGreener）是作者长期维护的成熟项目，')
-    L.append('随意改动其逻辑极易破坏功能，因此本仓库对它们**保持代码主体零改动**，优化集中在「同步上游最新版 + 元数据与依赖层面的非破坏性检查」，')
-    L.append('且每次改动都会记入 CHANGELOG。实质性优化只作用于自有脚本。')
+    L.append('**关于「优化」的边界（重要）**：')
+    L.append('')
+    L.append('- **大型脚本（> 200 KiB）完全不做改动**，只跟随作者更新。当前适用：Bilibili Evolved（1429 KB）、LinkSwift（571 KB）。')
+    L.append('- 其余第三方脚本**代码主体零改动**，优化仅限元数据层面的实证修复：失效依赖地址、缺失的 `@grant` 声明、不安全的资源地址。')
+    L.append('- 每项改动都必须可外部验证（HTTP 状态码、具体代码行号），并记录在 `tools/optimizations.json` 与 CHANGELOG。')
+    L.append('- 优化以声明式补丁表保存，重建时自动重放，不会因从篡改猴重新导出而丢失。')
     L.append('')
     L.append('## 三、脚本总览')
     L.append('')
@@ -365,6 +502,17 @@ def write_readme(root, doc):
             '代码主体原样归档，仅注入本仓库更新地址；后续由每周任务同步作者更新。' if m['origin'] == 'third_party'
             else '自有脚本，可直接做实质性优化与迭代；本次为当前优化后的版本。'))
         L.append('')
+        if m.get('optimized'):
+            fr = m.get('version_bumped_from') or m['original_version']
+            L.append('**本次优化**（`%s` → `%s`，仅改元数据，代码主体零改动）：' % (fr, m['version']))
+            L.append('')
+            for o in m['optimizations']:
+                if o['field'] == 'grant':
+                    L.append('- 补声明 `@grant %s` —— %s' % (o['name'], o['reason']))
+                else:
+                    tag = (' `%s`' % o['name']) if o.get('name') else ''
+                    L.append('- `@%s`%s —— `%s` → `%s`。%s' % (o['field'], tag, o['old'], o['new'], o['reason']))
+            L.append('')
         L.append('**本仓库更新地址**：')
         L.append('')
         L.append('```')
@@ -374,11 +522,60 @@ def write_readme(root, doc):
         L.append('')
     L.append('---')
     L.append('')
-    L.append('## 五、更新日志')
+    L.append('## 五、依赖与元数据健康检查')
+    L.append('')
+    L.append('2026-11-23 对全部脚本做的实测（只读检查，不改代码逻辑）：')
+    L.append('')
+    L.append('| 检查项 | 覆盖范围 | 结果 |')
+    L.append('|--------|----------|------|')
+    L.append('| `@require` 外部依赖 | 15 条，涉及 7 个脚本 | 全部 HTTP 200，内容均为有效 JS，无 HTML 错误页 |')
+    L.append('| SRI 完整性哈希 | GitHub-Plus 的 `#sha256=` | 与实际内容一致，可正常加载 |')
+    L.append('| `@resource` 资源 | 25 条 | 24 条正常；1 条 404（AC-baidu 的 `baiduLiteStyle`，**已修复**） |')
+    L.append('| `@icon` 图标 | 8 条 | 7 条正常；1 条明文 `http`（GitHub-Plus，**已改 https**） |')
+    L.append('| `@version` 格式 | 14 个脚本 | 全部合法 |')
+    L.append('| `@grant` 声明完整性 | 14 个脚本 | 2 个脚本调用了未声明的 `GM_info`（**已补**）；其余声明齐全 |')
+    L.append('| 重复 `@match` / `@include` | 14 个脚本 | 无重复 |')
+    L.append('| 资源名与代码调用一致性 | AC-baidu 22 个 `@resource` | 全部匹配，无静默取不到的资源 |')
+    L.append('')
+    _ki = _OPT.get('known_issues_not_fixed') or []
+    if _ki:
+        L.append('**已知但本次有意不处理**：')
+        L.append('')
+        for _it in _ki:
+            L.append('- **%s**：%s —— %s' % (_it.get('script', ''), _it.get('issue', ''), _it.get('why_not_fixed', '')))
+        L.append('')
+    _mt = sum(m.get('meta_bytes', 0) for m in ms)
+    L.append('**检查更新的流量优化**：`meta/*.meta.js` 只用于篡改猴比对 `@version`，已剔除 data URI 图标、`@resource`、`@note` 等与版本判断无关的字段。')
+    L.append('当前 14 个 meta 文件合计 **%.1f KB**（精简前约 100 KB），每次「检查更新」少下载约 60 KB。' % (_mt / 1024.0))
+    L.append('')
+    L.append('## 六、脚本共存与冲突排查')
+    L.append('')
+    _ov = doc.get('site_overlaps', {})
+    _wc = _ov.get('wildcard', [])
+    if _wc:
+        L.append('**全站型脚本**（匹配所有站点，需特别注意相互作用）：%s。' % '、'.join('`%s`' % x for x in _wc))
+        L.append('')
+    L.append('以下站点会被多个脚本同时注入（由各脚本的 `@match` / `@include` 自动统计）：')
+    L.append('')
+    L.append('| 站点 | 同时生效的脚本 |')
+    L.append('|------|----------------|')
+    for _o in _ov.get('overlaps', [])[:12]:
+        L.append('| `%s` | %s |' % (_o['site'], '、'.join(_o['scripts'])))
+    L.append('')
+    L.append('**排查建议**（出现异常时按此顺序定位，每次只改一项）：')
+    L.append('')
+    L.append('1. **全站型组合**：`AutoPager`（自动翻页）与 `Skip-Progress-Bar`（跳过进度条、改写链接跳转）都改导航行为，是唯一可能互相干扰的一对。若某些站点翻页失效或跳转异常，先临时禁用 `Skip-Progress-Bar` 验证。')
+    L.append('2. **通用拦截优先怀疑**：`Annoyances-Interception` 覆盖 67 条规则、命中大量站点。若某站点的正常元素被误删，优先禁用它定位。')
+    L.append('3. **GitHub 三件套**：`GitHub-Plus`、`GitHub-Zh-CN`、`Github-Enhancement` 都操作同一页面。界面错乱时按 `GitHub-Zh-CN` → `GitHub-Plus` → `Github-Enhancement` 顺序单独禁用定位。')
+    L.append('4. **同站同功能**：`zhihu.com` 上的 `Zhihu-AdClean-Focus` 与 `Annoyances-Interception`、`csdn.net` 上的 `CSDNGreener` 与 `Annoyances-Interception` 都属于"隐藏元素"类，通常互补；若布局异常再逐个排查。')
+    L.append('')
+    L.append('---')
+    L.append('')
+    L.append('## 七、更新日志')
     L.append('')
     L.append('见 [CHANGELOG.md](CHANGELOG.md)。')
     L.append('')
-    L.append('## 六、致谢')
+    L.append('## 八、致谢')
     L.append('')
     L.append('本仓库只是托管与整理，**所有第三方脚本的著作权、许可与功劳完全归原作者所有**。')
     L.append('衷心感谢以下作者（按脚本顺序）：')
@@ -415,11 +612,62 @@ def write_readme(root, doc):
         f.write('\n'.join(L))
 
 
+def _changelog_opt_block(doc):
+    """生成本次审查/优化的 CHANGELOG 记录块（幂等，标题含日期）。"""
+    om = [m for m in doc['scripts'] if m.get('optimized')]
+    if not om:
+        return []
+    tp = sum(1 for m in doc['scripts'] if m['origin'] == 'third_party')
+    L = ['## %s — 第三方脚本元数据审查与优化' % doc['generated_at'], '']
+    L.append('按「> 200 KiB 视为大型脚本、不做改动」的阈值，对 %d 个第三方脚本做了依赖与元数据的实证检查（HTTP 实测 + 代码行号比对）。' % tp)
+    L.append('')
+    for m in om:
+        fr = m.get('version_bumped_from') or m['original_version']
+        L.append('### %s（`%s` → `%s`）' % (m['name'], fr, m['version']))
+        L.append('')
+        for o in m['optimizations']:
+            if o['field'] == 'grant':
+                L.append('- 补声明 `@grant %s`：%s' % (o['name'], o['reason']))
+            else:
+                tag = (' `%s`' % o['name']) if o.get('name') else ''
+                L.append('- `@%s`%s：`%s` → `%s`。%s' % (o['field'], tag, o['old'], o['new'], o['reason']))
+        L.append('')
+    over = [m for m in doc['scripts'] if m.get('oversize')]
+    if over:
+        L.append('### 未改动（大型脚本）')
+        L.append('')
+        for m in over:
+            L.append('- %s（%.0f KB）：超过 200 KiB 阈值，按约定完全不动。' % (m['name'], m['size_bytes'] / 1024.0))
+        L.append('')
+    mt = sum(m.get('meta_bytes', 0) for m in doc['scripts'])
+    L.append('### 仓库侧优化')
+    L.append('')
+    L.append('- 精简 `meta/*.meta.js`：剔除 data URI 图标、`@resource`、`@note` 等与版本判断无关的字段，14 个 meta 合计降至 %.1f KB（原约 100 KB）。不影响篡改猴的版本判断。' % (mt / 1024.0))
+    L.append('- 新增 `tools/optimizations.json`：声明式补丁表，`build_from_export.py` 重建时自动重放，重新导出也不会丢失优化。')
+    L.append('- README 新增「依赖与元数据健康检查」「脚本共存与冲突排查」两章。')
+    L.append('')
+    return L
+
+
 def write_changelog(root, doc):
     path = os.path.join(root, 'CHANGELOG.md')
-    if os.path.exists(path):
-        return
     today = doc['generated_at']
+    opt_block = _changelog_opt_block(doc)
+
+    if os.path.exists(path):
+        text = open(path, encoding='utf-8').read()
+        if not opt_block:
+            return
+        if opt_block[0] in text:
+            print('  CHANGELOG: 本次记录已存在，跳过')
+            return
+        lines = text.split('\n')
+        idx = next((i for i, l in enumerate(lines) if l.startswith('## ')), len(lines))
+        merged = lines[:idx] + opt_block + [''] + lines[idx:]
+        with open(path, 'w', encoding='utf-8', newline='\n') as f:
+            f.write('\n'.join(merged))
+        return
+
     L = [
         '# 更新日志',
         '',
@@ -439,6 +687,8 @@ def write_changelog(root, doc):
         '- 新增 `README.md`（逐脚本注释 + 作者致谢）、`scripts-manifest.json`（机器可读清单）、`tools/build_from_export.py`（重建工具）。',
         '',
     ]
+    if opt_block:
+        L = L + opt_block
     with open(path, 'w', encoding='utf-8', newline='\n') as f:
         f.write('\n'.join(L))
 

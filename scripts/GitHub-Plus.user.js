@@ -2,14 +2,14 @@
 // @name         GitHub Plus
 // @name:zh-CN   GitHub 增强
 // @namespace    http://tampermonkey.net/
-// @version      0.7.1
+// @version      0.7.2
 // @description  Enhance GitHub with additional features.
 // @description:zh-CN 为 GitHub 增加额外的功能。
 // @author       PRO-2684
 // @match        https://github.com/*
 // @match        https://*.github.com/*
 // @run-at       document-start
-// @icon         http://github.com/favicon.ico
+// @icon         https://github.com/favicon.ico
 // @license      gpl-3.0
 // @grant        GM_setValue
 // @grant        GM_getValue
@@ -20,6 +20,7 @@
 // @grant        GM_addElement
 // @grant        GM_getResourceText
 // @grant        unsafeWindow
+// @grant        GM_info
 // @require      https://codeberg.org/PRO-2684/GM_config/releases/download/v1.2.3/config.min.js#sha256=9ba64cb2d9c9e7fb6436db4c8513aa8bab1e87928ca6479c5be1af88a3308449
 // @resource     catppuccin-associations https://codeberg.org/PRO-2684/gadgets/raw/branch/main/github_plus/catppuccin/associations.json
 // @resource     catppuccin-icons https://codeberg.org/PRO-2684/gadgets/raw/branch/main/github_plus/catppuccin/icons.json

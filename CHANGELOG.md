@@ -2,6 +2,32 @@
 
 每周自动任务会在此追加记录：上游版本变化、优化项、新增/移除脚本。
 
+## 2026-11-23 — 第三方脚本元数据审查与优化
+
+按「> 200 KiB 视为大型脚本、不做改动」的阈值，对 12 个第三方脚本做了依赖与元数据的实证检查（HTTP 实测 + 代码行号比对）。
+
+### GitHub Plus（`0.7.1` → `0.7.2`）
+
+- `@icon`：`http://github.com/favicon.ico` → `https://github.com/favicon.ico`。图标为明文 http，在 https 页面属混合内容，可能被浏览器阻止加载。
+- 补声明 `@grant GM_info`：脚本第 448 行使用 const { name, version } = GM_info.script，但 @grant 未声明 GM_info。
+
+### AC-baidu-重定向优化百度搜狗谷歌必应搜索_favicon_双列（`27.20` → `27.21`）
+
+- `@resource` `baiduLiteStyle`：`https://gitcode.net/-/snippets/1906/raw/master/LiteStyle.css?inline=false` → `https://ibaidu.tujidu.com/newcss/baiduLiteStyle.less?t=27.20`。原地址实测 HTTP 404（GitCode 资源下线/迁移）。替代地址为作者自有服务器上同命名规律的等效资源：实测 HTTP 200、60226 字节、文件头标注 Title: baidu-lite、含 #wrapper/.c-container/.result 等百度页面选择器，与另外 22 个 @resource 同域名同版本参数。
+- 补声明 `@grant GM_info`：脚本第 405 行使用 GM_info.script.version，但 @grant 未声明 GM_info；在严格实现的管理器中该 API 不可用，会抛 TypeError。
+
+### 未改动（大型脚本）
+
+- LinkSwift（571 KB）：超过 200 KiB 阈值，按约定完全不动。
+- Bilibili Evolved（1429 KB）：超过 200 KiB 阈值，按约定完全不动。
+
+### 仓库侧优化
+
+- 精简 `meta/*.meta.js`：剔除 data URI 图标、`@resource`、`@note` 等与版本判断无关的字段，14 个 meta 合计降至 41.0 KB（原约 100 KB）。不影响篡改猴的版本判断。
+- 新增 `tools/optimizations.json`：声明式补丁表，`build_from_export.py` 重建时自动重放，重新导出也不会丢失优化。
+- README 新增「依赖与元数据健康检查」「脚本共存与冲突排查」两章。
+
+
 ## 2026-11-23 — 仓库初始化
 
 - 创建仓库 `angussleeping/tampermonkey-scripts`，归档篡改猴中全部 14 个脚本。

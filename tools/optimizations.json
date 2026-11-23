@@ -1,0 +1,57 @@
+{
+  "_note": "第三方脚本的非破坏性优化补丁表。build_from_export.py 重建时会自动重放，避免从篡改猴重新导出后优化丢失。只允许改元数据，禁止改脚本主体逻辑。",
+  "version": 1,
+  "updated_at": "2026-11-23",
+  "policy": {
+    "large_script_threshold_bytes": 204800,
+    "large_script_note": "字节数 > 204800（200 KiB）视为大型成熟项目，完全不做改动。",
+    "scope_note": "其余脚本仅做元数据层面的实证修复：失效依赖地址、缺失权限声明、不安全资源地址。每次改动必须能在外部验证（HTTP 状态、代码行号）。"
+  },
+  "patches": {
+    "AC-baidu-Redirect": {
+      "version_bump": "27.21",
+      "replace_meta": [
+        {
+          "field": "resource",
+          "name": "baiduLiteStyle",
+          "old": "https://gitcode.net/-/snippets/1906/raw/master/LiteStyle.css?inline=false",
+          "new": "https://ibaidu.tujidu.com/newcss/baiduLiteStyle.less?t=27.20",
+          "reason": "原地址实测 HTTP 404（GitCode 资源下线/迁移）。替代地址为作者自有服务器上同命名规律的等效资源：实测 HTTP 200、60226 字节、文件头标注 Title: baidu-lite、含 #wrapper/.c-container/.result 等百度页面选择器，与另外 22 个 @resource 同域名同版本参数。"
+        }
+      ],
+      "add_grant": ["GM_info"],
+      "grant_reason": "脚本第 405 行使用 GM_info.script.version，但 @grant 未声明 GM_info；在严格实现的管理器中该 API 不可用，会抛 TypeError。"
+    },
+    "GitHub-Plus": {
+      "version_bump": "0.7.2",
+      "replace_meta": [
+        {
+          "field": "icon",
+          "old": "http://github.com/favicon.ico",
+          "new": "https://github.com/favicon.ico",
+          "reason": "图标为明文 http，在 https 页面属混合内容，可能被浏览器阻止加载。"
+        }
+      ],
+      "add_grant": ["GM_info"],
+      "grant_reason": "脚本第 448 行使用 const { name, version } = GM_info.script，但 @grant 未声明 GM_info。"
+    }
+  },
+  "meta_slim": {
+    "enabled": true,
+    "drop_fields": ["resource", "note"],
+    "drop_data_uri_icon": true,
+    "reason": "meta.js 仅用于篡改猴比对 @version。剔除 data URI 图标、@resource、@note 等与版本判断无关的大字段，可把检查更新的累计流量从约 110 KB 降到约 25 KB，且不影响更新判定。"
+  },
+  "known_issues_not_fixed": [
+    {
+      "script": "LinkSwift",
+      "issue": "同样使用 GM_info 未声明 @grant",
+      "why_not_fixed": "脚本 571 KB，超过 200 KiB 阈值，按约定不做改动。"
+    },
+    {
+      "script": "CSDNGreener",
+      "issue": "@require 的 jquery-cookie、nprogress 在代码中未检出使用",
+      "why_not_fixed": "检测方法存在假阴性风险（已在 AC-baidu 的 Vue 依赖上验证过误判），删除依赖收益（省 2 个请求）低于误删导致功能损坏的风险，按「保证功能完整」原则保留。"
+    }
+  ]
+}

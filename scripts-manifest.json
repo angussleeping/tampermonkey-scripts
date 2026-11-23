@@ -13,14 +13,14 @@
       "meta_file": "GitHub-Plus.meta.js",
       "name": "GitHub Plus",
       "author": "PRO-2684",
-      "version": "0.7.1",
+      "version": "0.7.2",
       "original_version": "0.7.1",
       "license": "gpl-3.0",
       "category": "GitHub 增强",
       "summary": "为 GitHub 增加额外功能，增强页面交互与信息展示。",
       "origin": "third_party",
       "enabled": true,
-      "size_bytes": 60642,
+      "size_bytes": 62116,
       "upstream_meta": "https://update.greasyfork.org/scripts/510742/GitHub%20Plus.meta.js",
       "upstream_download": "https://update.greasyfork.org/scripts/510742/GitHub%20Plus.user.js",
       "upstream_page": "https://greasyfork.org/scripts/510742",
@@ -28,21 +28,41 @@
       "supportURL": "",
       "match_count": 2,
       "namespace": "http://tampermonkey.net/",
-      "version_normalized": false
+      "version_normalized": false,
+      "version_bumped_from": "0.7.1",
+      "optimized": true,
+      "optimizations": [
+        {
+          "field": "icon",
+          "name": "",
+          "old": "http://github.com/favicon.ico",
+          "new": "https://github.com/favicon.ico",
+          "reason": "图标为明文 http，在 https 页面属混合内容，可能被浏览器阻止加载。"
+        },
+        {
+          "field": "grant",
+          "name": "GM_info",
+          "old": "(未声明)",
+          "new": "GM_info",
+          "reason": "脚本第 448 行使用 const { name, version } = GM_info.script，但 @grant 未声明 GM_info。"
+        }
+      ],
+      "meta_bytes": 1501,
+      "oversize": false
     },
     {
       "file": "AC-baidu-Redirect.user.js",
       "meta_file": "AC-baidu-Redirect.meta.js",
       "name": "AC-baidu-重定向优化百度搜狗谷歌必应搜索_favicon_双列",
       "author": "AC",
-      "version": "27.20",
+      "version": "27.21",
       "original_version": "27.20",
       "license": "GPL-3.0-only",
       "category": "搜索与跳转",
       "summary": "绕过百度 / 搜狗 / 谷歌 / 必应搜索结果的跳转链接，直达原始网页；附带 favicon 显示与双列布局。",
       "origin": "third_party",
       "enabled": true,
-      "size_bytes": 130032,
+      "size_bytes": 132978,
       "upstream_meta": "https://update.greasyfork.org/scripts/14178/AC-baidu-%E9%87%8D%E5%AE%9A%E5%90%91%E4%BC%98%E5%8C%96%E7%99%BE%E5%BA%A6%E6%90%9C%E7%8B%97%E8%B0%B7%E6%AD%8C%E5%BF%85%E5%BA%94%E6%90%9C%E7%B4%A2_favicon_%E5%8F%8C%E5%88%97.meta.js",
       "upstream_download": "https://update.greasyfork.org/scripts/14178/AC-baidu-%E9%87%8D%E5%AE%9A%E5%90%91%E4%BC%98%E5%8C%96%E7%99%BE%E5%BA%A6%E6%90%9C%E7%8B%97%E8%B0%B7%E6%AD%8C%E5%BF%85%E5%BA%94%E6%90%9C%E7%B4%A2_favicon_%E5%8F%8C%E5%88%97.user.js",
       "upstream_page": "https://greasyfork.org/zh-TW/scripts/14178",
@@ -50,7 +70,27 @@
       "supportURL": "https://joinqq.90dao.com",
       "match_count": 16,
       "namespace": "1353464539@qq.com",
-      "version_normalized": false
+      "version_normalized": false,
+      "version_bumped_from": "27.20",
+      "optimized": true,
+      "optimizations": [
+        {
+          "field": "resource",
+          "name": "baiduLiteStyle",
+          "old": "https://gitcode.net/-/snippets/1906/raw/master/LiteStyle.css?inline=false",
+          "new": "https://ibaidu.tujidu.com/newcss/baiduLiteStyle.less?t=27.20",
+          "reason": "原地址实测 HTTP 404（GitCode 资源下线/迁移）。替代地址为作者自有服务器上同命名规律的等效资源：实测 HTTP 200、60226 字节、文件头标注 Title: baidu-lite、含 #wrapper/.c-container/.result 等百度页面选择器，与另外 22 个 @resource 同域名同版本参数。"
+        },
+        {
+          "field": "grant",
+          "name": "GM_info",
+          "old": "(未声明)",
+          "new": "GM_info",
+          "reason": "脚本第 405 行使用 GM_info.script.version，但 @grant 未声明 GM_info；在严格实现的管理器中该 API 不可用，会抛 TypeError。"
+        }
+      ],
+      "meta_bytes": 4155,
+      "oversize": false
     },
     {
       "file": "Pan-Auto-Fill-Code.user.js",
@@ -72,7 +112,11 @@
       "supportURL": "https://scriptcat.org/script-show-page/373/issue",
       "match_count": 2,
       "namespace": "https://greasyfork.org/zh-CN/users/3128",
-      "version_normalized": false
+      "version_normalized": false,
+      "optimized": false,
+      "optimizations": [],
+      "meta_bytes": 3168,
+      "oversize": false
     },
     {
       "file": "Github-Enhancement-High-Speed-Download.user.js",
@@ -94,7 +138,11 @@
       "supportURL": "https://github.com/XIU2/UserScript",
       "match_count": 2,
       "namespace": "https://greasyfork.org/scripts/412245",
-      "version_normalized": false
+      "version_normalized": false,
+      "optimized": false,
+      "optimizations": [],
+      "meta_bytes": 2296,
+      "oversize": false
     },
     {
       "file": "AutoPager.user.js",
@@ -116,7 +164,11 @@
       "supportURL": "https://github.com/XIU2/UserScript",
       "match_count": 1,
       "namespace": "https://github.com/XIU2/UserScript",
-      "version_normalized": false
+      "version_normalized": false,
+      "optimized": false,
+      "optimizations": [],
+      "meta_bytes": 4887,
+      "oversize": false
     },
     {
       "file": "LinkSwift.user.js",
@@ -138,7 +190,11 @@
       "supportURL": "https://github.com/hmjz100/LinkSwift/issues",
       "match_count": 39,
       "namespace": "github.com/hmjz100",
-      "version_normalized": false
+      "version_normalized": false,
+      "optimized": false,
+      "optimizations": [],
+      "meta_bytes": 9920,
+      "oversize": true
     },
     {
       "file": "Bilibili-Evolved.user.js",
@@ -160,7 +216,11 @@
       "supportURL": "",
       "match_count": 1,
       "namespace": "",
-      "version_normalized": false
+      "version_normalized": false,
+      "optimized": false,
+      "optimizations": [],
+      "meta_bytes": 2716,
+      "oversize": true
     },
     {
       "file": "GitHub-Zh-CN.user.js",
@@ -182,7 +242,11 @@
       "supportURL": "",
       "match_count": 5,
       "namespace": "https://greasyfork.org/zh-CN/scripts/602755",
-      "version_normalized": false
+      "version_normalized": false,
+      "optimized": false,
+      "optimizations": [],
+      "meta_bytes": 2202,
+      "oversize": false
     },
     {
       "file": "Skip-Progress-Bar.user.js",
@@ -204,7 +268,11 @@
       "supportURL": "",
       "match_count": 1,
       "namespace": "fenda",
-      "version_normalized": false
+      "version_normalized": false,
+      "optimized": false,
+      "optimizations": [],
+      "meta_bytes": 1312,
+      "oversize": false
     },
     {
       "file": "Universal-Downloader.user.js",
@@ -226,7 +294,11 @@
       "supportURL": "",
       "match_count": 47,
       "namespace": "http://tampermonkey.net/",
-      "version_normalized": false
+      "version_normalized": false,
+      "optimized": false,
+      "optimizations": [],
+      "meta_bytes": 4406,
+      "oversize": false
     },
     {
       "file": "CSDNGreener.user.js",
@@ -248,7 +320,11 @@
       "supportURL": "https://github.com/adlered/CSDNGreener/issues/new?assignees=adlered&labels=help+wanted&template=ISSUE_TEMPLATE.md&title=",
       "match_count": 1,
       "namespace": "https://github.com/adlered",
-      "version_normalized": false
+      "version_normalized": false,
+      "optimized": false,
+      "optimizations": [],
+      "meta_bytes": 2090,
+      "oversize": false
     },
     {
       "file": "Annoyances-Interception.user.js",
@@ -270,7 +346,11 @@
       "supportURL": "",
       "match_count": 67,
       "namespace": "airbash/AnnoyancesInterception",
-      "version_normalized": false
+      "version_normalized": false,
+      "optimized": false,
+      "optimizations": [],
+      "meta_bytes": 4450,
+      "oversize": false
     },
     {
       "file": "Weibo-Chronological.user.js",
@@ -284,7 +364,7 @@
       "summary": "自动切到「最新微博」按实际时间排序；隐藏信息流中的「荐读」卡片并让下方微博上移补齐空位。",
       "origin": "self",
       "enabled": true,
-      "size_bytes": 9457,
+      "size_bytes": 9683,
       "upstream_meta": "",
       "upstream_download": "",
       "upstream_page": "",
@@ -292,7 +372,11 @@
       "supportURL": "",
       "match_count": 4,
       "namespace": "https://workbuddy.cn/userscripts",
-      "version_normalized": false
+      "version_normalized": false,
+      "optimized": false,
+      "optimizations": [],
+      "meta_bytes": 1102,
+      "oversize": false
     },
     {
       "file": "Zhihu-AdClean-Focus.user.js",
@@ -306,7 +390,7 @@
       "summary": "去掉知乎广告并提供沉浸模式（隐藏侧栏、主栏加宽）；与「知乎增强」脚本共存、功能互补。",
       "origin": "self",
       "enabled": true,
-      "size_bytes": 9310,
+      "size_bytes": 9486,
       "upstream_meta": "",
       "upstream_download": "",
       "upstream_page": "",
@@ -314,7 +398,80 @@
       "supportURL": "",
       "match_count": 1,
       "namespace": "http://tampermonkey.net/",
-      "version_normalized": true
+      "version_normalized": true,
+      "optimized": false,
+      "optimizations": [],
+      "meta_bytes": 1303,
+      "oversize": false
     }
-  ]
+  ],
+  "large_script_threshold_bytes": 204800,
+  "site_overlaps": {
+    "wildcard": [
+      "AutoPager",
+      "Skip-Progress-Bar"
+    ],
+    "overlaps": [
+      {
+        "site": "baidu.com",
+        "scripts": [
+          "AC-baidu-Redirect",
+          "Annoyances-Interception",
+          "LinkSwift",
+          "Universal-Downloader"
+        ]
+      },
+      {
+        "site": "github.com",
+        "scripts": [
+          "GitHub-Plus",
+          "GitHub-Zh-CN",
+          "Github-Enhancement-High-Speed-Download"
+        ]
+      },
+      {
+        "site": "quark.cn",
+        "scripts": [
+          "Annoyances-Interception",
+          "LinkSwift",
+          "Universal-Downloader"
+        ]
+      },
+      {
+        "site": "bilibili.com",
+        "scripts": [
+          "Annoyances-Interception",
+          "Bilibili-Evolved"
+        ]
+      },
+      {
+        "site": "csdn.net",
+        "scripts": [
+          "Annoyances-Interception",
+          "CSDNGreener"
+        ]
+      },
+      {
+        "site": "qq.com",
+        "scripts": [
+          "Annoyances-Interception",
+          "Universal-Downloader"
+        ]
+      },
+      {
+        "site": "so.com",
+        "scripts": [
+          "AC-baidu-Redirect",
+          "Universal-Downloader"
+        ]
+      },
+      {
+        "site": "zhihu.com",
+        "scripts": [
+          "Annoyances-Interception",
+          "Zhihu-AdClean-Focus"
+        ]
+      }
+    ]
+  }
 }

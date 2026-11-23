@@ -11,7 +11,7 @@
 // @license    GPL-3.0-only
 // @create     2015-11-25
 // @run-at     document-start
-// @version    27.20
+// @version    27.21
 // @connect    baidu.com
 // @connect    google.com
 // @connect    google.com.hk
@@ -126,7 +126,7 @@
 // @resource  HuYanStyle         https://ibaidu.tujidu.com/newcss/HuYanStyle.less?t=27.20
 // @resource  BgAutoFit          https://ibaidu.tujidu.com/newcss/BgAutoFit.less?t=27.20
 // @resource  HuaHua-ACDrakMode  https://ibaidu.tujidu.com/newcss/HuaHua-ACDrakMode.less?t=27.20
-// @resource  baiduLiteStyle     https://gitcode.net/-/snippets/1906/raw/master/LiteStyle.css?inline=false
+// @resource  baiduLiteStyle     https://ibaidu.tujidu.com/newcss/baiduLiteStyle.less?t=27.20
 // @require   https://registry.npmmirror.com/less_browser_fix/4.2.2/files/dist/less.min.js
 // @require   https://registry.npmmirror.com/vue/3.5.26/files/dist/vue.runtime.global.prod.js
 // @noframes
@@ -143,6 +143,7 @@
 // @grant    GM_registerMenuCommand
 // @grant    GM_addValueChangeListener
 // @grant    unsafeWindow
+// @grant    GM_info
 // @namespace 1353464539@qq.com
 // @updateURL    https://raw.githubusercontent.com/angussleeping/tampermonkey-scripts/master/meta/AC-baidu-Redirect.meta.js
 // @downloadURL  https://raw.githubusercontent.com/angussleeping/tampermonkey-scripts/master/scripts/AC-baidu-Redirect.user.js
