@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         微博：按时间排序 + 屏蔽荐读并补齐空位
 // @namespace    https://workbuddy.cn/userscripts
-// @version      1.0.0
+// @version      1.0.1
 // @description  自动切到「最新微博」按实际时间排序；隐藏信息流中的「荐读」卡片，并让下方微博自动上移、补齐空位
 // @author       WorkBuddy
 // @match        https://weibo.com/*

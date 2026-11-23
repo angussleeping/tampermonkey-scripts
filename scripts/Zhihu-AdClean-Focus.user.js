@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         知乎去广告 + 沉浸模式（精简优化版）
 // @namespace    http://tampermonkey.net/
-// @version      2.1.0
+// @version      2.1.1
 // @description  基于 shawn 的 killZhihuAd 1.4 精简优化：只保留去广告与沉浸模式，去除 jQuery 依赖与高频定时器，改用 CSS 规则 + 语义选择器适配新版知乎。选择器已按登录态页面与知乎美化 1.5.24 校验。屏蔽文章/视频/站外直链由「知乎增强」负责，两者可共存。
 // @author       shawn (原作) / 精简优化
 // @icon         https://www.zhihu.com/static/favicon.ico
@@ -46,6 +46,10 @@
  *     搜索页 .SearchMain+div、收藏页、文章页；修复改为 CSS 后首页侧栏不隐藏的问题
  *   - 增加登录提示 .Question-mainColumnLogin 与文章页推荐 .Recommendations-Main 的屏蔽
  *   - 补窄屏自适应媒体查询，避免 960px 固定宽度在小屏溢出
+ *
+ * v2.1.1（每周维护）
+ *   - 样式注入改为幂等：复用已存在的 #zhihu-adclean-style，避免重复执行时堆叠多份规则
+ *   - 菜单注册前校验 GM 菜单 API 是否存在，兼容不支持菜单的脚本管理器
  */
 
 (function () {
@@ -132,10 +136,14 @@
         '}'
     ].join('\n');
 
-    var style = document.createElement('style');
-    style.id = 'zhihu-adclean-style';
+    // 幂等注入：脚本被重复执行 / SPA 场景下复用已有 <style>，避免堆叠多份 CSS 规则。
+    var style = document.getElementById('zhihu-adclean-style');
+    if (!style) {
+        style = document.createElement('style');
+        style.id = 'zhihu-adclean-style';
+        (document.head || document.documentElement).appendChild(style);
+    }
     style.textContent = AD_BASIC_CSS + '\n' + AD_SEMANTIC_CSS + '\n' + FOCUS_CSS;
-    (document.head || document.documentElement).appendChild(style);
 
     // ---- 3. 沉浸模式开关 ----
     var FOCUS_KEY = 'focus_mode_on';
@@ -147,8 +155,10 @@
     }
 
     function renderMenu() {
-        if (menuId !== null) {
-            try { GM_unregisterMenuCommand(menuId); } catch (e) { /* 部分脚本管理器不支持 */ }
+        if (typeof GM_registerMenuCommand !== 'function') return; // 管理器不支持菜单 API 时静默跳过
+        if (menuId !== null && typeof GM_unregisterMenuCommand === 'function') {
+            try { GM_unregisterMenuCommand(menuId); } catch (e) { /* 忽略注销失败 */ }
+            menuId = null;
         }
         menuId = GM_registerMenuCommand(
             (focusOn ? '☑' : '☐') + ' 沉浸模式',

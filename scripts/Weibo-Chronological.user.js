@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         微博：按时间排序 + 屏蔽荐读并补齐空位
 // @namespace    https://workbuddy.cn/userscripts
-// @version      1.0.0
+// @version      1.0.1
 // @description  自动切到「最新微博」按实际时间排序；隐藏信息流中的「荐读」卡片，并让下方微博自动上移、补齐空位
 // @author       WorkBuddy
 // @match        https://weibo.com/*
@@ -21,6 +21,9 @@
 (function () {
     'use strict';
 
+    // v1.0.1：切换与隐藏统一由 MutationObserver 事件驱动（400ms 节流），
+    //         仅保留 15s 低频兜底；SPA 导航后立即重试切换，去除 1s / 4s 双高频轮询。
+
     /* ==================== 可调配置 ==================== */
     const CONFIG = {
         // 需要屏蔽的信息流标签文案（精确匹配，长度不超过 6 个字）
@@ -30,8 +33,9 @@
         // 荐读徽标图标的 class 片段。微博改版后此值可能失效，但文字识别仍然有效。
         recommendIconClass: '_cross_1v5ao_',
 
-        // 自动切换/扫描的轮询间隔（毫秒）
-        tickInterval: 1000,
+        // 低频兜底扫描间隔（毫秒）。日常切换与隐藏均由 MutationObserver 事件驱动，
+        // 此定时器仅用于整页替换 / 前端重绘等观察者未覆盖的场景（原为 1s + 4s 双轮询）。
+        rescanInterval: 15000,
 
         // 两次自动点击之间的最小间隔，避免反复点击打回顶部
         clickCooldown: 5000,
@@ -73,6 +77,17 @@
     let lastClickAt = 0;
     let fallbackDone = false;
 
+    // 「最新微博」切换由 DOM 变化事件驱动（见下方 MutationObserver），
+    // 以 400ms 节流合并，取代原来每 1s 一次的 setInterval 高频轮询。
+    let switchTimer = null;
+    function scheduleSwitch() {
+        if (switchTimer !== null) return;
+        switchTimer = window.setTimeout(function () {
+            switchTimer = null;
+            trySwitchToLatest();
+        }, 400);
+    }
+
     function trySwitchToLatest() {
         if (!isHomePage()) return;
 
@@ -103,6 +118,7 @@
     // SPA 导航后重置状态，保证再次回到首页时仍会自动切换
     function resetSwitchState() {
         switchedFor = '';
+        scheduleSwitch();
     }
     window.addEventListener('popstate', resetSwitchState);
     const rawPushState = history.pushState;
@@ -184,17 +200,27 @@
     }
 
     const observer = new MutationObserver(function (mutations) {
+        let hasNewNodes = false;
         for (const m of mutations) {
             for (const node of m.addedNodes) {
-                if (node.nodeType === 1) scheduleScan(node);
+                if (node.nodeType === 1) {
+                    scheduleScan(node);
+                    hasNewNodes = true;
+                }
             }
         }
+        // 「最新微博」按钮的出现同样是 DOM 变化，复用同一观察者，取代 1s 定时轮询
+        if (hasNewNodes) scheduleSwitch();
     });
     observer.observe(document.body, { childList: true, subtree: true });
 
-    // 首次扫描 + 定时兜底扫描（防止懒加载或前端重绘遗漏）
+    // 立即执行一次；此后由 MutationObserver 处理新增节点，仅保留一个 15s 低频兜底，
+    // 去除原 1s / 4s 双定时器的持续开销。
     scan(document.body);
-    window.setInterval(trySwitchToLatest, CONFIG.tickInterval);
-    window.setInterval(function () { scan(document.body); }, 4000);
+    trySwitchToLatest();
+    window.setInterval(function () {
+        trySwitchToLatest();
+        scan(document.body);
+    }, CONFIG.rescanInterval);
 
 })();
