@@ -4,7 +4,7 @@
 
 - **仓库**：[angussleeping/tampermonkey-scripts](https://github.com/angussleeping/tampermonkey-scripts)
 - **脚本数量**：14 个（12 个第三方 / 2 个自有）
-- **最近同步**：2026-11-23
+- **最近同步**：2026-11-24
 
 ---
 
@@ -50,7 +50,7 @@
 | 5 | [AutoPager](#s5) | X.I.U | `6.6.75` | 通用浏览增强 | 第三方 |
 | 6 | [LinkSwift](#s6) | Hmjz100、油小猴 | `1.1.3` | 下载工具 | 第三方 |
 | 7 | [Bilibili Evolved](#s7) | Grant Howard, Coulomb-G | `2.12.0` | 站点增强 · 哔哩哔哩 | 第三方 |
-| 8 | [GitHub 中文化（最全翻译版）](#s8) | Yujan | `2.18.2` | GitHub 增强 | 第三方 |
+| 8 | [GitHub 中文化（最全翻译版）](#s8) | Yujan | `2.18.4` | GitHub 增强 | 第三方 |
 | 9 | [⭐网页瞬间加载/跳过进度条直接加载网页（附重定向链接优化）⭐](#s9) | fenda | `1.0.15` | 搜索与跳转 | 第三方 |
 | 10 | [【最强无套路脚本】你能看见多少我能下载多少&下载公开免费的PPT、PDF、DOC、TXT等文件](#s10) | Mr.Fang | `7.8` | 下载工具 | 第三方 |
 | 11 | [「CSDNGreener」🍃CSDN广告完全过滤\|免登录\|个性化排版\|最强老牌脚本\|持续更新](#s11) | Adler | `5.0.5` | 站点增强 · CSDN | 第三方 |
@@ -269,7 +269,7 @@
 |----|------|
 | 文件 | [`scripts/GitHub-Zh-CN.user.js`](scripts/GitHub-Zh-CN.user.js) |
 | 作者 | Yujan |
-| 版本 | `2.18.2` |
+| 版本 | `2.18.4` |
 | 许可证 | GPL-3.0 |
 | 分类 | GitHub 增强 |
 | 匹配规则 | 5 条 `@match` / `@include` |
@@ -467,6 +467,7 @@
 
 - **LinkSwift**：同样使用 GM_info 未声明 @grant —— 脚本 571 KB，超过 200 KiB 阈值，按约定不做改动。
 - **CSDNGreener**：@require 的 jquery-cookie、nprogress 在代码中未检出使用 —— 检测方法存在假阴性风险（已在 AC-baidu 的 Vue 依赖上验证过误判），删除依赖收益（省 2 个请求）低于误删导致功能损坏的风险，按「保证功能完整」原则保留。
+- **GitHub 中文化 2.18.4**：上游新增的搜索框守护只记录非中文输入；当已有非中文输入记录时，后续中文输入可能在 500ms 检查中被恢复为旧值（脚本第 3033–3054 行）。属于上游主体逻辑，按第三方代码零改动原则不在本地修补，等待上游修正。
 
 **检查更新的流量优化**：`meta/*.meta.js` 只用于篡改猴比对 `@version`，已剔除 data URI 图标、`@resource`、`@note` 等与版本判断无关的字段。
 当前 14 个 meta 文件合计 **44.4 KB**（精简前约 100 KB），每次「检查更新」少下载约 60 KB。

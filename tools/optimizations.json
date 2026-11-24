@@ -1,7 +1,7 @@
 {
   "_note": "第三方脚本的非破坏性优化补丁表。build_from_export.py 重建时会自动重放，避免从篡改猴重新导出后优化丢失。只允许改元数据，禁止改脚本主体逻辑。",
   "version": 1,
-  "updated_at": "2026-11-23",
+  "updated_at": "2026-11-24",
   "policy": {
     "large_script_threshold_bytes": 204800,
     "large_script_note": "字节数 > 204800（200 KiB）视为大型成熟项目，完全不做改动。",
@@ -52,6 +52,11 @@
       "script": "CSDNGreener",
       "issue": "@require 的 jquery-cookie、nprogress 在代码中未检出使用",
       "why_not_fixed": "检测方法存在假阴性风险（已在 AC-baidu 的 Vue 依赖上验证过误判），删除依赖收益（省 2 个请求）低于误删导致功能损坏的风险，按「保证功能完整」原则保留。"
+    },
+    {
+      "script": "GitHub-Zh-CN",
+      "issue": "上游 2.18.4 的搜索框守护可能在已有非中文输入记录时误还原后续中文输入（第 3033–3054 行）",
+      "why_not_fixed": "属于上游新增主体逻辑，按第三方代码零改动原则不在本地修补，等待上游修正。"
     }
   ]
 }

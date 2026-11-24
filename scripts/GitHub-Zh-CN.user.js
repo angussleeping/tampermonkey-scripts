@@ -2,7 +2,7 @@
 // @name         GitHub 中文化（最全翻译版）
 // @name:en      GitHub Chinese Translator
 // @namespace    https://greasyfork.org/zh-CN/scripts/602755
-// @version      2.18.2
+// @version      2.18.4
 // @description  像「沉浸式翻译」那样，把 GitHub 界面与内容全部译成简体中文：导航、下拉菜单、弹窗、工具提示、占位符、README、Issue、PR 等，动态出现的内容也会即时翻译。界面术语用本地词表精确翻译（零请求），长文本用多翻译源兜底。
 // @description:en  Automatically translate GitHub UI and content into Simplified Chinese: precise local dictionary for UI terms, with online translation fallback for paragraphs, README and issues.
 // @author       Yujan
@@ -61,10 +61,17 @@
       '.markdown-body pre', '.markdown-body code',
       '[contenteditable="true"]',
       '.styled-input-container', '[role="combobox"]', 'input',
-      // 搜索输入框：输入内容/正在输入不翻译（只保护输入控件本身）
+      // 搜索输入框与搜索建议面板：输入内容、查询串、自动补全建议一律不翻译
       'input[type="search"]', '[data-testid="search-input"]', '[data-testid="top-search-input"]',
       'input[name="q"]', '.search-input', '#search-input',
       '[role="searchbox"]', '[role="textbox"]',
+      '[role="search"]', '[role="listbox"]', '[role="option"]',
+      '[data-testid="search-results"]', '[data-testid="search-suggestions"]',
+      '[class*="search-suggestions"]', '[class*="SearchSuggestions"]',
+      '[class*="search-input"]', '[class*="SearchInput"]',
+      '.header-search', '[class*="quick-search"]', '[class*="QuickSearch"]',
+      '[class*="command-palette"]', '[class*="CommandPalette"]',
+      'query-builder', '[data-target*="query-builder"]',
       // 仓库文件列表 / 文件树：文件夹与文件名不翻译
       '[aria-labelledby="files"]', '[aria-labelledby="folders-and-files"]', '[aria-label="Files"]',
       '[data-testid="directory-content"]', '[data-testid="tree-view"]', '[data-testid="directory-file-list"]',
@@ -1941,6 +1948,10 @@
     if (el.closest && el.closest('[data-zh-toggle]')) return true;
     if (el.isContentEditable) return true;
     if (el.closest(CFG.skipSelectors)) return true;
+    // 搜索弹层（可能挂在 body 下的 portal）：整块不翻译
+    if (el.closest('[data-testid="quick-search"], [class*="quick-search"], [id*="quick-search"], '
+      + '[role="dialog"][class*="search"], [class*="SearchOverlay"], [class*="search-overlay"], '
+      + '[class*="CommandPalette"], [class*="command-palette"], [data-testid*="command-palette"]')) return true;
     if (!CFG.translateRepoDesc && isRepoDescContext(el)) return true;
     if (!CFG.translateReadme && isReadmeContext(el)) return true;
     if (!CFG.translateIssue && isIssueContext(el)) return true;
@@ -2799,14 +2810,19 @@
 
   // 找到「关于」标题
   function findAboutHeading() {
-    const nodes = document.querySelectorAll('h2,h3,h4');
+    // 只认标题标签，且文本必须是「关于」/「About」本身
+    const nodes = document.querySelectorAll('h2, h3, h4');
     for (const el of nodes) {
-      const t = (el.textContent || '').replace(/\s+/g, ' ').trim();
-      if (t !== '关于' && t !== 'About') continue;
-      if (el.closest('[class*="OverviewSidebar"]')) {
-        const r = el.getBoundingClientRect();
-        if (r.width > 10 && r.height <= 40) return el;
-      }
+      if (el.querySelector('[data-zh-toggle]')) continue;
+      // 排除已插入按钮后产生的额外文字
+      const clone = el.cloneNode(true);
+      clone.querySelectorAll('[data-zh-toggle]').forEach((x) => x.remove());
+      const own = (clone.textContent || '').replace(/\s+/g, ' ').trim();
+      if (own !== '关于' && own !== 'About') continue;
+      if (el.tagName !== 'H2') continue;
+      if (!el.closest('[class*="OverviewSidebar"], [class*="SidebarSection"]')) continue;
+      const r = el.getBoundingClientRect();
+      if (r.width > 10 && r.height > 0 && r.height <= 40) return el;
     }
     return null;
   }
@@ -2814,6 +2830,16 @@
   function placeToggles() {
     refreshPageState();
     ensureToggleStyle();
+    // 清理位置不正确的残留按钮（父元素不是期望的标题/工具栏时移除，稍后重建）
+    document.querySelectorAll('[data-zh-toggle="about"]').forEach((b) => {
+      const p = b.parentElement;
+      if (!p || p.tagName !== 'H2') { try { b.remove(); } catch (e) {} }
+    });
+    document.querySelectorAll('[data-zh-toggle="readme"]').forEach((b) => {
+      const p = b.parentElement;
+      const ok = p && (p.tagName === 'NAV' || p.tagName === 'UL' || /Box_3|readmeHeaderSlot/.test(p.className || ''));
+      if (!ok) { try { b.remove(); } catch (e) {} }
+    });
     // 同步已有按钮的外观与状态
     document.querySelectorAll('[data-zh-toggle]').forEach((b) => {
       const k = b.getAttribute('data-zh-toggle');
@@ -2884,9 +2910,11 @@
       const h = findAboutHeading();
       if (h) {
         const b = makeToggle('about', '翻译简介');
+        // 按钮只做行内元素，跟随标题文字，不改变标题容器的布局方式
         b.style.marginLeft = '8px';
-        // 插到 H2 之后（不放进 H2 内部，避免触发父级点击行为）
-        h.insertAdjacentElement('afterend', b);
+        b.style.verticalAlign = 'middle';
+        b.style.flexShrink = '0';
+        h.appendChild(b);
       }
     }
   }
@@ -2985,6 +3013,46 @@
       if (pageState.issue) CFG.translateIssue = true;
     } catch (e) {}
   }
+
+  // 搜索框守护：记住用户实际输入，一旦被改成中文立即还原
+  (function () {
+    const CJK = /[\u4e00-\u9fff]/;
+    const lastTyped = new WeakMap();
+
+    function isSearchInput(el) {
+      if (!el || el.tagName !== 'INPUT') return false;
+      const t = (el.getAttribute('type') || '').toLowerCase();
+      const role = (el.getAttribute('role') || '').toLowerCase();
+      const tid = el.getAttribute('data-testid') || '';
+      const name = el.getAttribute('name') || '';
+      return t === 'search' || role === 'combobox' || role === 'searchbox'
+        || /search|query/i.test(tid) || name === 'q';
+    }
+
+    // 记录用户真实输入
+    document.addEventListener('input', (e) => {
+      const el = e.target;
+      if (!isSearchInput(el)) return;
+      const v = el.value || '';
+      if (!CJK.test(v)) lastTyped.set(el, v);
+    }, true);
+
+    // 定期检查：若输入框被写成中文，还原成用户原文
+    setInterval(() => {
+      document.querySelectorAll('input').forEach((el) => {
+        if (!isSearchInput(el)) return;
+        const v = el.value || '';
+        if (!v || !CJK.test(v)) return;
+        const orig = lastTyped.get(el);
+        if (typeof orig === 'string' && orig !== v) {
+          try {
+            el.value = orig;
+            el.dispatchEvent(new Event('input', { bubbles: true }));
+          } catch (e) {}
+        }
+      });
+    }, 500);
+  })();
 
   function boot() {
     syncFlagsFromSession();
