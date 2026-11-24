@@ -2,6 +2,14 @@
 
 每周自动任务会在此追加记录：上游版本变化、优化项、新增/移除脚本。
 
+## 2026-11-24 — 更新地址迁移到 jsDelivr
+
+- **背景**：本机 `raw.githubusercontent.com` 被 DevSidecar 代理拦截（`ERR_INVALID_PROTOCOL`），篡改猴经 raw 地址无法检查更新。
+- **迁移**：全部 14 个脚本的 `@updateURL` / `@downloadURL` 改指 `https://cdn.jsdelivr.net/gh/angussleeping/tampermonkey-scripts@master/...`；`tools/build_from_export.py` 的 `RAW_BASE` / `META_BASE` 与 `scripts-manifest.json` 的 `raw_base` / `meta_base` 同步更新，重建时保持一致。
+- **版本号**：14 个脚本统一 +1（如 `2.18.5` → `2.18.6`、`2.12.0` → `2.12.1`），使篡改猴按常规「更新」覆盖已安装脚本；不升版则旧安装仍指向 raw，无法自动检查更新。
+- **缓存说明**：jsDelivr 对 `@master` 分支引用约 12 小时缓存，推送后可能延迟生效；本轮已用 jsDelivr purge 接口主动刷新。
+- **校验**：全部 ≤ 200 KiB 脚本通过 `node --check`；14 个 meta 与 manifest 的版本、字节数一致。
+
 ## 2026-11-24 — 审查规则升级 + GitHub 中文化本地修复
 
 - **审查规则**：每次审查都核对全部脚本（含 > 200 KiB 的 Bilibili Evolved、LinkSwift）的上游版本，并判断上游改动属于优化还是回归；本地优化（含代码补丁）仅限 ≤ 200 KiB 的脚本，> 200 KiB 只原样跟随上游。已同步更新 README 与 `tools/optimizations.json` 的 policy。

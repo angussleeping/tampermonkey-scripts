@@ -11,7 +11,7 @@
 // @license    GPL-3.0-only
 // @create     2015-11-25
 // @run-at     document-start
-// @version    27.21
+// @version    27.22
 // @connect    baidu.com
 // @connect    google.com
 // @connect    google.com.hk
@@ -69,8 +69,8 @@
 // @grant    unsafeWindow
 // @grant    GM_info
 // @namespace 1353464539@qq.com
-// @updateURL    https://raw.githubusercontent.com/angussleeping/tampermonkey-scripts/master/meta/AC-baidu-Redirect.meta.js
-// @downloadURL  https://raw.githubusercontent.com/angussleeping/tampermonkey-scripts/master/scripts/AC-baidu-Redirect.user.js
+// @updateURL    https://cdn.jsdelivr.net/gh/angussleeping/tampermonkey-scripts@master/meta/AC-baidu-Redirect.meta.js
+// @downloadURL  https://cdn.jsdelivr.net/gh/angussleeping/tampermonkey-scripts@master/scripts/AC-baidu-Redirect.user.js
 // ---------- 本副本由 angussleeping/tampermonkey-scripts 托管 ----------
 // 上游原地址: https://update.greasyfork.org/scripts/14178/AC-baidu-%E9%87%8D%E5%AE%9A%E5%90%91%E4%BC%98%E5%8C%96%E7%99%BE%E5%BA%A6%E6%90%9C%E7%8B%97%E8%B0%B7%E6%AD%8C%E5%BF%85%E5%BA%94%E6%90%9C%E7%B4%A2_favicon_%E5%8F%8C%E5%88%97.meta.js
 // 托管仓库:   https://github.com/angussleeping/tampermonkey-scripts

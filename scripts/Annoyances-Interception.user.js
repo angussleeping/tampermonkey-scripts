@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         骚扰拦截
-// @version      1.5.9
+// @version      1.5.10
 // @namespace    airbash/AnnoyancesInterception
 // @homepageURL  https://github.com/AirBashX/UserScript
 // @author       airbash
@@ -77,8 +77,8 @@
 // @run-at       document-body
 // @grant        none
 // @license      GPL-3.0
-// @updateURL    https://raw.githubusercontent.com/angussleeping/tampermonkey-scripts/master/meta/Annoyances-Interception.meta.js
-// @downloadURL  https://raw.githubusercontent.com/angussleeping/tampermonkey-scripts/master/scripts/Annoyances-Interception.user.js
+// @updateURL    https://cdn.jsdelivr.net/gh/angussleeping/tampermonkey-scripts@master/meta/Annoyances-Interception.meta.js
+// @downloadURL  https://cdn.jsdelivr.net/gh/angussleeping/tampermonkey-scripts@master/scripts/Annoyances-Interception.user.js
 // ---------- 本副本由 angussleeping/tampermonkey-scripts 托管 ----------
 // 上游原地址: https://update.greasyfork.org/scripts/440871/%E9%AA%9A%E6%89%B0%E6%8B%A6%E6%88%AA.meta.js
 // 托管仓库:   https://github.com/angussleeping/tampermonkey-scripts

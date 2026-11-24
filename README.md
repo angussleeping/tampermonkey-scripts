@@ -10,15 +10,15 @@
 
 ## 一、一次性配置（只做一次）
 
-仓库里的脚本已经把 `@updateURL` / `@downloadURL` 指向本仓库的 raw 地址。**要让篡改猴改用这个地址，需要你操作一次**：
+仓库里的脚本已经把 `@updateURL` / `@downloadURL` 指向本仓库的 jsDelivr CDN 地址（`raw.githubusercontent.com` 在部分网络下会被代理拦截）。**要让篡改猴改用这个地址，需要你操作一次**：
 
-1. 打开篡改猴管理面板 → 「实用工具」→「导入」，选择本仓库 `scripts/` 下的 `.user.js`（或直接把 raw 链接粘进浏览器地址栏安装）；
+1. 打开篡改猴管理面板 → 「实用工具」→「导入」，选择本仓库 `scripts/` 下的 `.user.js`（或直接把下文的 CDN 下载链接粘进浏览器地址栏安装）；
 2. 覆盖安装同名脚本即可。**`@namespace` 与 `@name` 均保持原样**，篡改猴会识别为同一个脚本，你原有的菜单设置与 `GM_setValue` 数据不会丢失；
 3. 之后每周任务提交新版本时，篡改猴会自动检测到版本号变化并更新（也可在管理面板点「检查更新」手动触发）。
 
-> 每个脚本有两个地址：`@updateURL` 指向 `meta/` 下轻量的 `.meta.js`（只含元数据，用于检查版本），`@downloadURL` 指向 `scripts/` 下完整的 `.user.js`。
-> 如果 `raw.githubusercontent.com` 在你的网络下不可用，可把这两个地址整体替换为 jsDelivr 镜像：
+> 每个脚本有两个地址：`@updateURL` 指向 `meta/` 下轻量的 `.meta.js`（只含元数据，用于检查版本），`@downloadURL` 指向 `scripts/` 下完整的 `.user.js`，两者都走 jsDelivr：
 > `https://cdn.jsdelivr.net/gh/angussleeping/tampermonkey-scripts@master/meta/<文件名>.meta.js` 与 `https://cdn.jsdelivr.net/gh/angussleeping/tampermonkey-scripts@master/scripts/<文件名>.user.js`
+> jsDelivr 对 `@master` 分支引用有约 12 小时缓存，推送后最长需等待半天才能被「检查更新」看到；急用时可用 raw 地址手动安装。
 
 ## 二、每周自动更新机制
 
@@ -44,20 +44,20 @@
 
 | # | 脚本 | 作者 | 版本 | 分类 | 来源 |
 |---|------|------|------|------|------|
-| 1 | [GitHub Plus](#s1) | PRO-2684 | `0.7.2` | GitHub 增强 | 第三方 |
-| 2 | [AC-baidu-重定向优化百度搜狗谷歌必应搜索_favicon_双列](#s2) | AC | `27.21` | 搜索与跳转 | 第三方 |
-| 3 | [网盘自动填写访问码【威力加强版】](#s3) | 极品小猫 | `3.25.41.2` | 下载工具 | 第三方 |
-| 4 | [Github Enhancement - High Speed Download](#s4) | X.I.U | `2.6.41` | GitHub 增强 | 第三方 |
-| 5 | [AutoPager](#s5) | X.I.U | `6.6.75` | 通用浏览增强 | 第三方 |
-| 6 | [LinkSwift](#s6) | Hmjz100、油小猴 | `1.1.3` | 下载工具 | 第三方 |
-| 7 | [Bilibili Evolved](#s7) | Grant Howard, Coulomb-G | `2.12.0` | 站点增强 · 哔哩哔哩 | 第三方 |
-| 8 | [GitHub 中文化（最全翻译版）](#s8) | Yujan | `2.18.5` | GitHub 增强 | 第三方 |
-| 9 | [⭐网页瞬间加载/跳过进度条直接加载网页（附重定向链接优化）⭐](#s9) | fenda | `1.0.15` | 搜索与跳转 | 第三方 |
-| 10 | [【最强无套路脚本】你能看见多少我能下载多少&下载公开免费的PPT、PDF、DOC、TXT等文件](#s10) | Mr.Fang | `7.8` | 下载工具 | 第三方 |
-| 11 | [「CSDNGreener」🍃CSDN广告完全过滤\|免登录\|个性化排版\|最强老牌脚本\|持续更新](#s11) | Adler | `5.0.5` | 站点增强 · CSDN | 第三方 |
-| 12 | [骚扰拦截](#s12) | airbash | `1.5.9` | 通用浏览增强 | 第三方 |
-| 13 | [微博：按时间排序 + 屏蔽荐读并补齐空位](#s13) | WorkBuddy | `1.0.1` | 站点增强 · 微博 | 自有 |
-| 14 | [知乎去广告 + 沉浸模式（精简优化版）](#s14) | shawn (原作) / 精简优化 | `2.1.1` | 站点增强 · 知乎 | 自有 |
+| 1 | [GitHub Plus](#s1) | PRO-2684 | `0.7.3` | GitHub 增强 | 第三方 |
+| 2 | [AC-baidu-重定向优化百度搜狗谷歌必应搜索_favicon_双列](#s2) | AC | `27.22` | 搜索与跳转 | 第三方 |
+| 3 | [网盘自动填写访问码【威力加强版】](#s3) | 极品小猫 | `3.25.41.3` | 下载工具 | 第三方 |
+| 4 | [Github Enhancement - High Speed Download](#s4) | X.I.U | `2.6.42` | GitHub 增强 | 第三方 |
+| 5 | [AutoPager](#s5) | X.I.U | `6.6.76` | 通用浏览增强 | 第三方 |
+| 6 | [LinkSwift](#s6) | Hmjz100、油小猴 | `1.1.4` | 下载工具 | 第三方 |
+| 7 | [Bilibili Evolved](#s7) | Grant Howard, Coulomb-G | `2.12.1` | 站点增强 · 哔哩哔哩 | 第三方 |
+| 8 | [GitHub 中文化（最全翻译版）](#s8) | Yujan | `2.18.6` | GitHub 增强 | 第三方 |
+| 9 | [⭐网页瞬间加载/跳过进度条直接加载网页（附重定向链接优化）⭐](#s9) | fenda | `1.0.16` | 搜索与跳转 | 第三方 |
+| 10 | [【最强无套路脚本】你能看见多少我能下载多少&下载公开免费的PPT、PDF、DOC、TXT等文件](#s10) | Mr.Fang | `7.9` | 下载工具 | 第三方 |
+| 11 | [「CSDNGreener」🍃CSDN广告完全过滤\|免登录\|个性化排版\|最强老牌脚本\|持续更新](#s11) | Adler | `5.0.6` | 站点增强 · CSDN | 第三方 |
+| 12 | [骚扰拦截](#s12) | airbash | `1.5.10` | 通用浏览增强 | 第三方 |
+| 13 | [微博：按时间排序 + 屏蔽荐读并补齐空位](#s13) | WorkBuddy | `1.0.2` | 站点增强 · 微博 | 自有 |
+| 14 | [知乎去广告 + 沉浸模式（精简优化版）](#s14) | shawn (原作) / 精简优化 | `2.1.2` | 站点增强 · 知乎 | 自有 |
 
 ---
 
@@ -71,7 +71,7 @@
 |----|------|
 | 文件 | [`scripts/GitHub-Plus.user.js`](scripts/GitHub-Plus.user.js) |
 | 作者 | PRO-2684 |
-| 版本 | `0.7.2` |
+| 版本 | `0.7.3` |
 | 许可证 | gpl-3.0 |
 | 分类 | GitHub 增强 |
 | 匹配规则 | 2 条 `@match` / `@include` |
@@ -83,7 +83,7 @@
 
 **本仓库处理**：代码主体原样归档，仅注入本仓库更新地址；后续由每周任务同步作者更新。
 
-**本次优化**（`0.7.1` → `0.7.2`，仅改元数据，代码主体零改动）：
+**累计优化**（`0.7.1` → `0.7.3`，含图标 / 权限修复与更新地址迁移，代码主体零改动）：
 
 - `@icon` —— `http://github.com/favicon.ico` → `https://github.com/favicon.ico`。图标为明文 http，在 https 页面属混合内容，可能被浏览器阻止加载。
 - 补声明 `@grant GM_info` —— 脚本第 448 行使用 const { name, version } = GM_info.script，但 @grant 未声明 GM_info。
@@ -91,8 +91,8 @@
 **本仓库更新地址**：
 
 ```
-检查更新 (@updateURL)   : https://raw.githubusercontent.com/angussleeping/tampermonkey-scripts/master/meta/GitHub-Plus.meta.js
-下载代码 (@downloadURL) : https://raw.githubusercontent.com/angussleeping/tampermonkey-scripts/master/scripts/GitHub-Plus.user.js
+检查更新 (@updateURL)   : https://cdn.jsdelivr.net/gh/angussleeping/tampermonkey-scripts@master/meta/GitHub-Plus.meta.js
+下载代码 (@downloadURL) : https://cdn.jsdelivr.net/gh/angussleeping/tampermonkey-scripts@master/scripts/GitHub-Plus.user.js
 ```
 
 <a id="s2"></a>
@@ -103,7 +103,7 @@
 |----|------|
 | 文件 | [`scripts/AC-baidu-Redirect.user.js`](scripts/AC-baidu-Redirect.user.js) |
 | 作者 | AC |
-| 版本 | `27.21` |
+| 版本 | `27.22` |
 | 许可证 | GPL-3.0-only |
 | 分类 | 搜索与跳转 |
 | 匹配规则 | 16 条 `@match` / `@include` |
@@ -115,7 +115,7 @@
 
 **本仓库处理**：代码主体原样归档，仅注入本仓库更新地址；后续由每周任务同步作者更新。
 
-**本次优化**（`27.20` → `27.21`，仅改元数据，代码主体零改动）：
+**累计优化**（`27.20` → `27.22`，含资源 / 权限修复与更新地址迁移，代码主体零改动）：
 
 - `@resource` `baiduLiteStyle` —— `https://gitcode.net/-/snippets/1906/raw/master/LiteStyle.css?inline=false` → `https://ibaidu.tujidu.com/newcss/baiduLiteStyle.less?t=27.20`。原地址实测 HTTP 404（GitCode 资源下线/迁移）。替代地址为作者自有服务器上同命名规律的等效资源：实测 HTTP 200、60226 字节、文件头标注 Title: baidu-lite、含 #wrapper/.c-container/.result 等百度页面选择器，与另外 22 个 @resource 同域名同版本参数。
 - 补声明 `@grant GM_info` —— 脚本第 405 行使用 GM_info.script.version，但 @grant 未声明 GM_info；在严格实现的管理器中该 API 不可用，会抛 TypeError。
@@ -123,8 +123,8 @@
 **本仓库更新地址**：
 
 ```
-检查更新 (@updateURL)   : https://raw.githubusercontent.com/angussleeping/tampermonkey-scripts/master/meta/AC-baidu-Redirect.meta.js
-下载代码 (@downloadURL) : https://raw.githubusercontent.com/angussleeping/tampermonkey-scripts/master/scripts/AC-baidu-Redirect.user.js
+检查更新 (@updateURL)   : https://cdn.jsdelivr.net/gh/angussleeping/tampermonkey-scripts@master/meta/AC-baidu-Redirect.meta.js
+下载代码 (@downloadURL) : https://cdn.jsdelivr.net/gh/angussleeping/tampermonkey-scripts@master/scripts/AC-baidu-Redirect.user.js
 ```
 
 <a id="s3"></a>
@@ -135,7 +135,7 @@
 |----|------|
 | 文件 | [`scripts/Pan-Auto-Fill-Code.user.js`](scripts/Pan-Auto-Fill-Code.user.js) |
 | 作者 | 极品小猫 |
-| 版本 | `3.25.41.2` |
+| 版本 | `3.25.41.3` |
 | 许可证 | GPL-3.0 License |
 | 分类 | 下载工具 |
 | 匹配规则 | 2 条 `@match` / `@include` |
@@ -150,8 +150,8 @@
 **本仓库更新地址**：
 
 ```
-检查更新 (@updateURL)   : https://raw.githubusercontent.com/angussleeping/tampermonkey-scripts/master/meta/Pan-Auto-Fill-Code.meta.js
-下载代码 (@downloadURL) : https://raw.githubusercontent.com/angussleeping/tampermonkey-scripts/master/scripts/Pan-Auto-Fill-Code.user.js
+检查更新 (@updateURL)   : https://cdn.jsdelivr.net/gh/angussleeping/tampermonkey-scripts@master/meta/Pan-Auto-Fill-Code.meta.js
+下载代码 (@downloadURL) : https://cdn.jsdelivr.net/gh/angussleeping/tampermonkey-scripts@master/scripts/Pan-Auto-Fill-Code.user.js
 ```
 
 <a id="s4"></a>
@@ -162,7 +162,7 @@
 |----|------|
 | 文件 | [`scripts/Github-Enhancement-High-Speed-Download.user.js`](scripts/Github-Enhancement-High-Speed-Download.user.js) |
 | 作者 | X.I.U |
-| 版本 | `2.6.41` |
+| 版本 | `2.6.42` |
 | 许可证 | GPL-3.0 License |
 | 分类 | GitHub 增强 |
 | 匹配规则 | 2 条 `@match` / `@include` |
@@ -177,8 +177,8 @@
 **本仓库更新地址**：
 
 ```
-检查更新 (@updateURL)   : https://raw.githubusercontent.com/angussleeping/tampermonkey-scripts/master/meta/Github-Enhancement-High-Speed-Download.meta.js
-下载代码 (@downloadURL) : https://raw.githubusercontent.com/angussleeping/tampermonkey-scripts/master/scripts/Github-Enhancement-High-Speed-Download.user.js
+检查更新 (@updateURL)   : https://cdn.jsdelivr.net/gh/angussleeping/tampermonkey-scripts@master/meta/Github-Enhancement-High-Speed-Download.meta.js
+下载代码 (@downloadURL) : https://cdn.jsdelivr.net/gh/angussleeping/tampermonkey-scripts@master/scripts/Github-Enhancement-High-Speed-Download.user.js
 ```
 
 <a id="s5"></a>
@@ -189,7 +189,7 @@
 |----|------|
 | 文件 | [`scripts/AutoPager.user.js`](scripts/AutoPager.user.js) |
 | 作者 | X.I.U |
-| 版本 | `6.6.75` |
+| 版本 | `6.6.76` |
 | 许可证 | GPL-3.0 License |
 | 分类 | 通用浏览增强 |
 | 匹配规则 | 1 条 `@match` / `@include` |
@@ -204,8 +204,8 @@
 **本仓库更新地址**：
 
 ```
-检查更新 (@updateURL)   : https://raw.githubusercontent.com/angussleeping/tampermonkey-scripts/master/meta/AutoPager.meta.js
-下载代码 (@downloadURL) : https://raw.githubusercontent.com/angussleeping/tampermonkey-scripts/master/scripts/AutoPager.user.js
+检查更新 (@updateURL)   : https://cdn.jsdelivr.net/gh/angussleeping/tampermonkey-scripts@master/meta/AutoPager.meta.js
+下载代码 (@downloadURL) : https://cdn.jsdelivr.net/gh/angussleeping/tampermonkey-scripts@master/scripts/AutoPager.user.js
 ```
 
 <a id="s6"></a>
@@ -216,7 +216,7 @@
 |----|------|
 | 文件 | [`scripts/LinkSwift.user.js`](scripts/LinkSwift.user.js) |
 | 作者 | Hmjz100、油小猴 |
-| 版本 | `1.1.3` |
+| 版本 | `1.1.4` |
 | 许可证 | AGPL-3.0-or-later |
 | 分类 | 下载工具 |
 | 匹配规则 | 39 条 `@match` / `@include` |
@@ -231,8 +231,8 @@
 **本仓库更新地址**：
 
 ```
-检查更新 (@updateURL)   : https://raw.githubusercontent.com/angussleeping/tampermonkey-scripts/master/meta/LinkSwift.meta.js
-下载代码 (@downloadURL) : https://raw.githubusercontent.com/angussleeping/tampermonkey-scripts/master/scripts/LinkSwift.user.js
+检查更新 (@updateURL)   : https://cdn.jsdelivr.net/gh/angussleeping/tampermonkey-scripts@master/meta/LinkSwift.meta.js
+下载代码 (@downloadURL) : https://cdn.jsdelivr.net/gh/angussleeping/tampermonkey-scripts@master/scripts/LinkSwift.user.js
 ```
 
 <a id="s7"></a>
@@ -243,7 +243,7 @@
 |----|------|
 | 文件 | [`scripts/Bilibili-Evolved.user.js`](scripts/Bilibili-Evolved.user.js) |
 | 作者 | Grant Howard, Coulomb-G |
-| 版本 | `2.12.0` |
+| 版本 | `2.12.1` |
 | 许可证 | MIT |
 | 分类 | 站点增强 · 哔哩哔哩 |
 | 匹配规则 | 1 条 `@match` / `@include` |
@@ -258,8 +258,8 @@
 **本仓库更新地址**：
 
 ```
-检查更新 (@updateURL)   : https://raw.githubusercontent.com/angussleeping/tampermonkey-scripts/master/meta/Bilibili-Evolved.meta.js
-下载代码 (@downloadURL) : https://raw.githubusercontent.com/angussleeping/tampermonkey-scripts/master/scripts/Bilibili-Evolved.user.js
+检查更新 (@updateURL)   : https://cdn.jsdelivr.net/gh/angussleeping/tampermonkey-scripts@master/meta/Bilibili-Evolved.meta.js
+下载代码 (@downloadURL) : https://cdn.jsdelivr.net/gh/angussleeping/tampermonkey-scripts@master/scripts/Bilibili-Evolved.user.js
 ```
 
 <a id="s8"></a>
@@ -270,7 +270,7 @@
 |----|------|
 | 文件 | [`scripts/GitHub-Zh-CN.user.js`](scripts/GitHub-Zh-CN.user.js) |
 | 作者 | Yujan |
-| 版本 | `2.18.5`（上游 `2.18.4` + 本地代码修复） |
+| 版本 | `2.18.6`（上游 `2.18.4` + 本地修复与地址迁移） |
 | 许可证 | GPL-3.0 |
 | 分类 | GitHub 增强 |
 | 匹配规则 | 5 条 `@match` / `@include` |
@@ -282,15 +282,16 @@
 
 **本仓库处理**：代码主体跟随上游归档，并应用一处最小本地补丁；后续由每周任务同步作者更新。
 
-**本次优化**（`2.18.4` → `2.18.5`）：
+**本次优化**（`2.18.4` → `2.18.6`）：
 
 - 搜索框守护改为只记录可信（`e.isTrusted`）的用户输入 —— 上游 2.18.4 只记录非中文输入，用户先输入英文、再输入中文时，中文会在 500ms 内被还原成旧值（第 3033–3054 行）。改为记录全部真实用户输入后，中文不再被误还原，脚本注入的中文仍会被还原。
+- `@updateURL` / `@downloadURL` 切到 jsDelivr CDN（本次全仓库统一迁移，见第一章）。
 
 **本仓库更新地址**：
 
 ```
-检查更新 (@updateURL)   : https://raw.githubusercontent.com/angussleeping/tampermonkey-scripts/master/meta/GitHub-Zh-CN.meta.js
-下载代码 (@downloadURL) : https://raw.githubusercontent.com/angussleeping/tampermonkey-scripts/master/scripts/GitHub-Zh-CN.user.js
+检查更新 (@updateURL)   : https://cdn.jsdelivr.net/gh/angussleeping/tampermonkey-scripts@master/meta/GitHub-Zh-CN.meta.js
+下载代码 (@downloadURL) : https://cdn.jsdelivr.net/gh/angussleeping/tampermonkey-scripts@master/scripts/GitHub-Zh-CN.user.js
 ```
 
 <a id="s9"></a>
@@ -301,7 +302,7 @@
 |----|------|
 | 文件 | [`scripts/Skip-Progress-Bar.user.js`](scripts/Skip-Progress-Bar.user.js) |
 | 作者 | fenda |
-| 版本 | `1.0.15` |
+| 版本 | `1.0.16` |
 | 许可证 | MPL-2.0 |
 | 分类 | 搜索与跳转 |
 | 匹配规则 | 1 条 `@match` / `@include` |
@@ -316,8 +317,8 @@
 **本仓库更新地址**：
 
 ```
-检查更新 (@updateURL)   : https://raw.githubusercontent.com/angussleeping/tampermonkey-scripts/master/meta/Skip-Progress-Bar.meta.js
-下载代码 (@downloadURL) : https://raw.githubusercontent.com/angussleeping/tampermonkey-scripts/master/scripts/Skip-Progress-Bar.user.js
+检查更新 (@updateURL)   : https://cdn.jsdelivr.net/gh/angussleeping/tampermonkey-scripts@master/meta/Skip-Progress-Bar.meta.js
+下载代码 (@downloadURL) : https://cdn.jsdelivr.net/gh/angussleeping/tampermonkey-scripts@master/scripts/Skip-Progress-Bar.user.js
 ```
 
 <a id="s10"></a>
@@ -328,7 +329,7 @@
 |----|------|
 | 文件 | [`scripts/Universal-Downloader.user.js`](scripts/Universal-Downloader.user.js) |
 | 作者 | Mr.Fang |
-| 版本 | `7.8` |
+| 版本 | `7.9` |
 | 许可证 | Apache-2.0 |
 | 分类 | 下载工具 |
 | 匹配规则 | 47 条 `@match` / `@include` |
@@ -343,8 +344,8 @@
 **本仓库更新地址**：
 
 ```
-检查更新 (@updateURL)   : https://raw.githubusercontent.com/angussleeping/tampermonkey-scripts/master/meta/Universal-Downloader.meta.js
-下载代码 (@downloadURL) : https://raw.githubusercontent.com/angussleeping/tampermonkey-scripts/master/scripts/Universal-Downloader.user.js
+检查更新 (@updateURL)   : https://cdn.jsdelivr.net/gh/angussleeping/tampermonkey-scripts@master/meta/Universal-Downloader.meta.js
+下载代码 (@downloadURL) : https://cdn.jsdelivr.net/gh/angussleeping/tampermonkey-scripts@master/scripts/Universal-Downloader.user.js
 ```
 
 <a id="s11"></a>
@@ -355,7 +356,7 @@
 |----|------|
 | 文件 | [`scripts/CSDNGreener.user.js`](scripts/CSDNGreener.user.js) |
 | 作者 | Adler |
-| 版本 | `5.0.5` |
+| 版本 | `5.0.6` |
 | 许可证 | AGPL-3.0-or-later |
 | 分类 | 站点增强 · CSDN |
 | 匹配规则 | 1 条 `@match` / `@include` |
@@ -370,8 +371,8 @@
 **本仓库更新地址**：
 
 ```
-检查更新 (@updateURL)   : https://raw.githubusercontent.com/angussleeping/tampermonkey-scripts/master/meta/CSDNGreener.meta.js
-下载代码 (@downloadURL) : https://raw.githubusercontent.com/angussleeping/tampermonkey-scripts/master/scripts/CSDNGreener.user.js
+检查更新 (@updateURL)   : https://cdn.jsdelivr.net/gh/angussleeping/tampermonkey-scripts@master/meta/CSDNGreener.meta.js
+下载代码 (@downloadURL) : https://cdn.jsdelivr.net/gh/angussleeping/tampermonkey-scripts@master/scripts/CSDNGreener.user.js
 ```
 
 <a id="s12"></a>
@@ -382,7 +383,7 @@
 |----|------|
 | 文件 | [`scripts/Annoyances-Interception.user.js`](scripts/Annoyances-Interception.user.js) |
 | 作者 | airbash |
-| 版本 | `1.5.9` |
+| 版本 | `1.5.10` |
 | 许可证 | GPL-3.0 |
 | 分类 | 通用浏览增强 |
 | 匹配规则 | 67 条 `@match` / `@include` |
@@ -397,8 +398,8 @@
 **本仓库更新地址**：
 
 ```
-检查更新 (@updateURL)   : https://raw.githubusercontent.com/angussleeping/tampermonkey-scripts/master/meta/Annoyances-Interception.meta.js
-下载代码 (@downloadURL) : https://raw.githubusercontent.com/angussleeping/tampermonkey-scripts/master/scripts/Annoyances-Interception.user.js
+检查更新 (@updateURL)   : https://cdn.jsdelivr.net/gh/angussleeping/tampermonkey-scripts@master/meta/Annoyances-Interception.meta.js
+下载代码 (@downloadURL) : https://cdn.jsdelivr.net/gh/angussleeping/tampermonkey-scripts@master/scripts/Annoyances-Interception.user.js
 ```
 
 <a id="s13"></a>
@@ -409,7 +410,7 @@
 |----|------|
 | 文件 | [`scripts/Weibo-Chronological.user.js`](scripts/Weibo-Chronological.user.js) |
 | 作者 | WorkBuddy |
-| 版本 | `1.0.1` |
+| 版本 | `1.0.2` |
 | 许可证 | 未标注（版权归原作者） |
 | 分类 | 站点增强 · 微博 |
 | 匹配规则 | 4 条 `@match` / `@include` |
@@ -422,8 +423,8 @@
 **本仓库更新地址**：
 
 ```
-检查更新 (@updateURL)   : https://raw.githubusercontent.com/angussleeping/tampermonkey-scripts/master/meta/Weibo-Chronological.meta.js
-下载代码 (@downloadURL) : https://raw.githubusercontent.com/angussleeping/tampermonkey-scripts/master/scripts/Weibo-Chronological.user.js
+检查更新 (@updateURL)   : https://cdn.jsdelivr.net/gh/angussleeping/tampermonkey-scripts@master/meta/Weibo-Chronological.meta.js
+下载代码 (@downloadURL) : https://cdn.jsdelivr.net/gh/angussleeping/tampermonkey-scripts@master/scripts/Weibo-Chronological.user.js
 ```
 
 <a id="s14"></a>
@@ -434,7 +435,7 @@
 |----|------|
 | 文件 | [`scripts/Zhihu-AdClean-Focus.user.js`](scripts/Zhihu-AdClean-Focus.user.js) |
 | 作者 | shawn (原作) / 精简优化 |
-| 版本 | `2.1.1`（由 `2.1 (2026-11-23)` 规范化） |
+| 版本 | `2.1.2`（由 `2.1 (2026-11-23)` 规范化） |
 | 许可证 | 未标注（版权归原作者） |
 | 分类 | 站点增强 · 知乎 |
 | 匹配规则 | 1 条 `@match` / `@include` |
@@ -447,8 +448,8 @@
 **本仓库更新地址**：
 
 ```
-检查更新 (@updateURL)   : https://raw.githubusercontent.com/angussleeping/tampermonkey-scripts/master/meta/Zhihu-AdClean-Focus.meta.js
-下载代码 (@downloadURL) : https://raw.githubusercontent.com/angussleeping/tampermonkey-scripts/master/scripts/Zhihu-AdClean-Focus.user.js
+检查更新 (@updateURL)   : https://cdn.jsdelivr.net/gh/angussleeping/tampermonkey-scripts@master/meta/Zhihu-AdClean-Focus.meta.js
+下载代码 (@downloadURL) : https://cdn.jsdelivr.net/gh/angussleeping/tampermonkey-scripts@master/scripts/Zhihu-AdClean-Focus.user.js
 ```
 
 ---
@@ -475,10 +476,10 @@
 
 **本轮本地代码补丁（≤ 200 KiB 脚本）**：
 
-- **GitHub 中文化 `2.18.4` → `2.18.5`**：上游 2.18.4 的搜索框守护只记录非中文输入，先输入英文再输入中文时，中文会在 500ms 内被还原成旧值。改为只信任用户真实输入（`e.isTrusted`）后，中文会更新基准值，脚本注入的中文仍会被还原。补丁以 `replace_code` 记录在 `tools/optimizations.json`，重建时自动重放。
+- **GitHub 中文化 `2.18.4` → `2.18.6`**：上游 2.18.4 的搜索框守护只记录非中文输入，先输入英文再输入中文时，中文会在 500ms 内被还原成旧值。改为只信任用户真实输入（`e.isTrusted`）后，中文会更新基准值，脚本注入的中文仍会被还原。补丁以 `replace_code` 记录在 `tools/optimizations.json`，重建时自动重放。
 
 **检查更新的流量优化**：`meta/*.meta.js` 只用于篡改猴比对 `@version`，已剔除 data URI 图标、`@resource`、`@note` 等与版本判断无关的字段。
-当前 14 个 meta 文件合计 **44.4 KB**（精简前约 100 KB），每次「检查更新」少下载约 60 KB。
+当前 14 个 meta 文件合计 **40.6 KB**（精简前约 100 KB），每次「检查更新」少下载约 60 KB。
 
 ## 六、脚本共存与冲突排查
 

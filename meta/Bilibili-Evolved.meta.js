@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name            Bilibili Evolved
 // @description     强大的哔哩哔哩增强脚本
-// @version         2.12.0
+// @version         2.12.1
 // @author          Grant Howard, Coulomb-G
 // @copyright       2026, Grant Howard (https://github.com/the1812) & Coulomb-G (https://github.com/Coulomb-G)
 // @license         MIT
@@ -43,8 +43,8 @@
 // @require         https://raw.githubusercontent.com/lodash/lodash/4.17.21/dist/lodash.min.js#sha256=a9705dfc47c0763380d851ab1801be6f76019f6b67e40e9b873f8b4a0603f7a9
 // @icon            https://raw.githubusercontent.com/the1812/Bilibili-Evolved/preview/images/logo-small.png
 // @icon64          https://raw.githubusercontent.com/the1812/Bilibili-Evolved/preview/images/logo.png
-// @updateURL    https://raw.githubusercontent.com/angussleeping/tampermonkey-scripts/master/meta/Bilibili-Evolved.meta.js
-// @downloadURL  https://raw.githubusercontent.com/angussleeping/tampermonkey-scripts/master/scripts/Bilibili-Evolved.user.js
+// @updateURL    https://cdn.jsdelivr.net/gh/angussleeping/tampermonkey-scripts@master/meta/Bilibili-Evolved.meta.js
+// @downloadURL  https://cdn.jsdelivr.net/gh/angussleeping/tampermonkey-scripts@master/scripts/Bilibili-Evolved.user.js
 // ---------- 本副本由 angussleeping/tampermonkey-scripts 托管 ----------
 // 上游原地址: https://raw.githubusercontent.com/the1812/Bilibili-Evolved/master/dist/bilibili-evolved.user.js
 // 托管仓库:   https://github.com/angussleeping/tampermonkey-scripts

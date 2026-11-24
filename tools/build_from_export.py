@@ -28,8 +28,8 @@ import datetime
 
 REPO = "angussleeping/tampermonkey-scripts"
 BRANCH = "master"
-RAW_BASE = "https://raw.githubusercontent.com/%s/%s/scripts/" % (REPO, BRANCH)
-META_BASE = "https://raw.githubusercontent.com/%s/%s/meta/" % (REPO, BRANCH)
+RAW_BASE = "https://cdn.jsdelivr.net/gh/%s@%s/scripts/" % (REPO, BRANCH)
+META_BASE = "https://cdn.jsdelivr.net/gh/%s@%s/meta/" % (REPO, BRANCH)
 REPO_URL = "https://github.com/" + REPO
 
 # 按导出顺序给出稳定、可读、无特殊字符的文件名

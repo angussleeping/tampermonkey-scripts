@@ -3,7 +3,7 @@
 // @description	    智能融合网盘密码到网址中，打开网盘链接时不再需要手动复制密码，并自动提交密码，一路畅通无阻。同时记录网盘信息，当你再次打开该分享文件时，不再需要去找提取码，同时可追溯网盘地址的来源。
 // @author          极品小猫
 // @namespace       https://greasyfork.org/zh-CN/users/3128
-// @version         3.25.41.2
+// @version         3.25.41.3
 //
 // @include         http://*
 // @include         https://*
@@ -55,8 +55,8 @@
 // @encoding         utf-8
 // @run-at          document-idle
 // @license          GPL-3.0 License
-// @updateURL    https://raw.githubusercontent.com/angussleeping/tampermonkey-scripts/master/meta/Pan-Auto-Fill-Code.meta.js
-// @downloadURL  https://raw.githubusercontent.com/angussleeping/tampermonkey-scripts/master/scripts/Pan-Auto-Fill-Code.user.js
+// @updateURL    https://cdn.jsdelivr.net/gh/angussleeping/tampermonkey-scripts@master/meta/Pan-Auto-Fill-Code.meta.js
+// @downloadURL  https://cdn.jsdelivr.net/gh/angussleeping/tampermonkey-scripts@master/scripts/Pan-Auto-Fill-Code.user.js
 // ---------- 本副本由 angussleeping/tampermonkey-scripts 托管 ----------
 // 上游原地址: https://update.greasyfork.org/scripts/29762/%E7%BD%91%E7%9B%98%E8%87%AA%E5%8A%A8%E5%A1%AB%E5%86%99%E8%AE%BF%E9%97%AE%E7%A0%81%E3%80%90%E5%A8%81%E5%8A%9B%E5%8A%A0%E5%BC%BA%E7%89%88%E3%80%91.meta.js
 // 托管仓库:   https://github.com/angussleeping/tampermonkey-scripts

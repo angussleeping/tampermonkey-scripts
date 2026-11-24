@@ -2,7 +2,7 @@
 // @name         【最强无套路脚本】你能看见多少我能下载多少&下载公开免费的PPT、PDF、DOC、TXT等文件
 // @namespace    http://tampermonkey.net/
 // @homepage	 https://github.com/systemmin/kill-doc
-// @version      7.8
+// @version      7.9
 // @description  百度|原创力|人人|360文库|豆丁|豆丁建筑|道客|MBA智库|得力|七彩学科|金锄头|爱问|蚂蚁|读根网|搜弘|微传网|淘豆网|GB|国标全文公开|JJG|行业标准|轻竹办公|自然标准|交通标准|飞书|江苏计量|水利部|招投标|能源标准|认证认可标准|腾讯文档|绿色建站|电网|夸克文库等公开免费文档下载
 // @author       Mr.Fang
 // @match        https://*.book118.com/*
@@ -65,8 +65,8 @@
 // @grant        GM_addStyle
 // @grant        unsafeWindow
 // @license      Apache-2.0
-// @updateURL    https://raw.githubusercontent.com/angussleeping/tampermonkey-scripts/master/meta/Universal-Downloader.meta.js
-// @downloadURL  https://raw.githubusercontent.com/angussleeping/tampermonkey-scripts/master/scripts/Universal-Downloader.user.js
+// @updateURL    https://cdn.jsdelivr.net/gh/angussleeping/tampermonkey-scripts@master/meta/Universal-Downloader.meta.js
+// @downloadURL  https://cdn.jsdelivr.net/gh/angussleeping/tampermonkey-scripts@master/scripts/Universal-Downloader.user.js
 // ---------- 本副本由 angussleeping/tampermonkey-scripts 托管 ----------
 // 上游原地址: https://update.greasyfork.org/scripts/486211/%E3%80%90%E6%9C%80%E5%BC%BA%E6%97%A0%E5%A5%97%E8%B7%AF%E8%84%9A%E6%9C%AC%E3%80%91%E4%BD%A0%E8%83%BD%E7%9C%8B%E8%A7%81%E5%A4%9A%E5%B0%91%E6%88%91%E8%83%BD%E4%B8%8B%E8%BD%BD%E5%A4%9A%E5%B0%91%E4%B8%8B%E8%BD%BD%E5%85%AC%E5%BC%80%E5%85%8D%E8%B4%B9%E7%9A%84PPT%E3%80%81PDF%E3%80%81DOC%E3%80%81TXT%E7%AD%89%E6%96%87%E4%BB%B6.meta.js
 // 托管仓库:   https://github.com/angussleeping/tampermonkey-scripts

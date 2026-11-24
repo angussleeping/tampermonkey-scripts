@@ -3,7 +3,7 @@
 // @name:zh-CN   自动无缝翻页
 // @name:zh-TW   自動無縫翻頁
 // @name:ru      Автостраничник
-// @version      6.6.75
+// @version      6.6.76
 // @author       X.I.U
 // @description  ⭐Append the next page content to the bottom seamlessly (like a waterfall, Unlimited scrolling, no need to manually click on the next page) ⭐, support various forums, social networking, games, comics, novels, academics, search engines (Google, Bing, Yahoo...) and other websites~
 // @description:zh-CN  ⭐无缝加载 下一页内容 至网页底部（类似瀑布流，无限滚动，无需手动点击下一页）⭐，支持各论坛、社交、游戏、漫画、小说、学术、搜索引擎(Google、Bing、Yahoo...) 等网站~
@@ -86,8 +86,8 @@
 // @exclude      https://*.guazi.com/*
 // @exclude      https://*.liepin.com/*
 // @exclude      https://*.58.com/*
-// @updateURL    https://raw.githubusercontent.com/angussleeping/tampermonkey-scripts/master/meta/AutoPager.meta.js
-// @downloadURL  https://raw.githubusercontent.com/angussleeping/tampermonkey-scripts/master/scripts/AutoPager.user.js
+// @updateURL    https://cdn.jsdelivr.net/gh/angussleeping/tampermonkey-scripts@master/meta/AutoPager.meta.js
+// @downloadURL  https://cdn.jsdelivr.net/gh/angussleeping/tampermonkey-scripts@master/scripts/AutoPager.user.js
 // ---------- 本副本由 angussleeping/tampermonkey-scripts 托管 ----------
 // 上游原地址: https://update.greasyfork.org/scripts/419215/%E8%87%AA%E5%8A%A8%E6%97%A0%E7%BC%9D%E7%BF%BB%E9%A1%B5.meta.js
 // 托管仓库:   https://github.com/angussleeping/tampermonkey-scripts

@@ -2,7 +2,7 @@
 // @name         GitHub Plus
 // @name:zh-CN   GitHub 增强
 // @namespace    http://tampermonkey.net/
-// @version      0.7.2
+// @version      0.7.3
 // @description  Enhance GitHub with additional features.
 // @description:zh-CN 为 GitHub 增加额外的功能。
 // @author       PRO-2684
@@ -25,8 +25,8 @@
 // @resource     catppuccin-associations https://codeberg.org/PRO-2684/gadgets/raw/branch/main/github_plus/catppuccin/associations.json
 // @resource     catppuccin-icons https://codeberg.org/PRO-2684/gadgets/raw/branch/main/github_plus/catppuccin/icons.json
 // @resource     catppuccin-palette https://codeberg.org/PRO-2684/gadgets/raw/branch/main/github_plus/catppuccin/palette.json
-// @updateURL    https://raw.githubusercontent.com/angussleeping/tampermonkey-scripts/master/meta/GitHub-Plus.meta.js
-// @downloadURL  https://raw.githubusercontent.com/angussleeping/tampermonkey-scripts/master/scripts/GitHub-Plus.user.js
+// @updateURL    https://cdn.jsdelivr.net/gh/angussleeping/tampermonkey-scripts@master/meta/GitHub-Plus.meta.js
+// @downloadURL  https://cdn.jsdelivr.net/gh/angussleeping/tampermonkey-scripts@master/scripts/GitHub-Plus.user.js
 // ---------- 本副本由 angussleeping/tampermonkey-scripts 托管 ----------
 // 上游原地址: https://update.greasyfork.org/scripts/510742/GitHub%20Plus.meta.js
 // 托管仓库:   https://github.com/angussleeping/tampermonkey-scripts
