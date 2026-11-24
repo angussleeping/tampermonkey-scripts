@@ -2,7 +2,7 @@
 // @name         GitHub 中文化（最全翻译版）
 // @name:en      GitHub Chinese Translator
 // @namespace    https://greasyfork.org/zh-CN/scripts/602755
-// @version      2.18.4
+// @version      2.18.5
 // @description  像「沉浸式翻译」那样，把 GitHub 界面与内容全部译成简体中文：导航、下拉菜单、弹窗、工具提示、占位符、README、Issue、PR 等，动态出现的内容也会即时翻译。界面术语用本地词表精确翻译（零请求），长文本用多翻译源兜底。
 // @description:en  Automatically translate GitHub UI and content into Simplified Chinese: precise local dictionary for UI terms, with online translation fallback for paragraphs, README and issues.
 // @author       Yujan
@@ -3032,9 +3032,8 @@
     // 记录用户真实输入
     document.addEventListener('input', (e) => {
       const el = e.target;
-      if (!isSearchInput(el)) return;
-      const v = el.value || '';
-      if (!CJK.test(v)) lastTyped.set(el, v);
+      if (!isSearchInput(el) || !e.isTrusted) return;
+      lastTyped.set(el, el.value || '');
     }, true);
 
     // 定期检查：若输入框被写成中文，还原成用户原文

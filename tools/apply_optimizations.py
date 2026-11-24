@@ -124,6 +124,14 @@ for entry in man['scripts']:
                 'reason': opt.get('grant_reason', ''),
             })
 
+        # ---- 4. 代码级补丁（仅限 < 200 KiB 的脚本） ----
+        if code.count('\r\n'):
+            nl2 = '\r\n'
+        else:
+            nl2 = '\n'
+        if len(code.encode('utf-8')) <= THRESHOLD:
+            code = B.apply_code_replacements(code, opt.get('replace_code'), applied, nl2)
+
     entry['optimized'] = bool(applied)
     entry['optimizations'] = applied
     size_now = len(code.encode('utf-8'))

@@ -242,6 +242,7 @@ def patch_code(code, slug, upstream_meta, upstream_download, file_url):
                 out.append(x + nl)
         out.append(raw)
 
+    result = apply_code_replacements(''.join(out), opt.get('replace_code'), applied, nl)
     info = {
         'orig_updateURL': orig_update,
         'orig_downloadURL': orig_download,
@@ -249,7 +250,38 @@ def patch_code(code, slug, upstream_meta, upstream_download, file_url):
         'version_bumped_from': version_bumped_from,
         'applied': applied,
     }
-    return ''.join(out), info
+    return result, info
+
+
+def apply_code_replacements(code, reps, applied, nl='\n'):
+    """应用工具链侧的代码级补丁（replace_code）。
+
+    仅用于小于 200 KiB 的脚本；幂等：目标内容已存在时跳过，找不到原文时告警而不报错。
+    """
+    for rep in reps or []:
+        old = (rep.get('old') or '').replace('\r\n', '\n')
+        new = (rep.get('new') or '').replace('\r\n', '\n')
+        if not old or not new:
+            continue
+        pairs = [(old, new)]
+        if nl != '\n':
+            pairs.append((old.replace('\n', nl), new.replace('\n', nl)))
+        if any(n in code for _, n in pairs):
+            continue
+        for o, n in pairs:
+            if o in code:
+                code = code.replace(o, n, 1)
+                applied.append({
+                    'field': 'code',
+                    'name': rep.get('name', ''),
+                    'old': old,
+                    'new': new,
+                    'reason': rep.get('reason', ''),
+                })
+                break
+        else:
+            print('  [WARN] code patch 未匹配: %s' % (rep.get('name') or old[:40]))
+    return code
 
 
 def slim_meta(meta_text, cfg):
@@ -441,9 +473,9 @@ def write_readme(root, doc):
     L.append('')
     L.append('```')
     L.append('每周定时触发')
-    L.append('  ├─ 1. 读取 scripts-manifest.json，按 upstream_meta / upstream_download 检查各脚本作者是否发布新版本')
-    L.append('  ├─ 2. 上游有更新 → 拉取新版、做语法校验与差异对比')
-    L.append('  ├─ 3. 分析与优化：自有脚本做实质优化；第三方脚本只做非破坏性检查（依赖地址可用性、@match/@grant 冗余、已知冲突）')
+    L.append('  ├─ 1. 读取 scripts-manifest.json，按 upstream_meta / upstream_download 核对**全部脚本**（含 > 200 KiB）的上游版本')
+    L.append('  ├─ 2. 上游有更新 → 拉取新版、做语法校验与差异对比，判断改动属于优化还是回归')
+    L.append('  ├─ 3. 分析与优化：本地优化只针对 ≤ 200 KiB 的脚本（自有脚本可直接改；第三方仅做最小补丁）；> 200 KiB 只原样跟随上游')
     L.append('  ├─ 4. 识别篡改猴中新增的脚本（读取最新导出文件或扩展存储），纳入本仓库')
     L.append('  ├─ 5. 提升版本号、更新 README / CHANGELOG / manifest，提交到 GitHub')
     L.append('  └─ 6. 篡改猴通过 @updateURL 检测到新版本 → 自动更新到本地')
@@ -451,8 +483,9 @@ def write_readme(root, doc):
     L.append('')
     L.append('**关于「优化」的边界（重要）**：')
     L.append('')
-    L.append('- **大型脚本（> 200 KiB）完全不做改动**，只跟随作者更新。当前适用：Bilibili Evolved（1429 KB）、LinkSwift（571 KB）。')
-    L.append('- 其余第三方脚本**代码主体零改动**，优化仅限元数据层面的实证修复：失效依赖地址、缺失的 `@grant` 声明、不安全的资源地址。')
+    L.append('- **上游检查覆盖全部脚本**，包括 Bilibili Evolved（1429 KB）与 LinkSwift（571 KB）。')
+    L.append('- **> 200 KiB 的脚本只跟随作者更新**：有新版时原样同步，不在本地改代码。')
+    L.append('- **≤ 200 KiB 的脚本允许本地优化**：元数据修复（失效依赖地址、缺失 `@grant`、不安全资源地址）与最小代码补丁（`replace_code`），改后必须通过 `node --check`。')
     L.append('- 每项改动都必须可外部验证（HTTP 状态码、具体代码行号），并记录在 `tools/optimizations.json` 与 CHANGELOG。')
     L.append('- 优化以声明式补丁表保存，重建时自动重放，不会因从篡改猴重新导出而丢失。')
     L.append('')

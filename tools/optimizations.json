@@ -1,11 +1,12 @@
 {
-  "_note": "第三方脚本的非破坏性优化补丁表。build_from_export.py 重建时会自动重放，避免从篡改猴重新导出后优化丢失。只允许改元数据，禁止改脚本主体逻辑。",
+  "_note": "脚本优化补丁表。build_from_export.py / apply_optimizations.py 重建与同步时自动重放，避免从篡改猴重新导出后丢失。仅允许对不超过 200 KiB 的脚本改元数据（replace_meta / add_grant）与做最小代码补丁（replace_code）；> 200 KiB 的脚本只跟随上游、不改代码。",
   "version": 1,
   "updated_at": "2026-11-24",
   "policy": {
     "large_script_threshold_bytes": 204800,
-    "large_script_note": "字节数 > 204800（200 KiB）视为大型成熟项目，完全不做改动。",
-    "scope_note": "其余脚本仅做元数据层面的实证修复：失效依赖地址、缺失权限声明、不安全资源地址。每次改动必须能在外部验证（HTTP 状态、代码行号）。"
+    "large_script_note": "字节数 > 204800（200 KiB）视为大型成熟项目：每周仍核对上游版本，有更新则原样同步，但不在本地修改代码。",
+    "scope_note": "本地优化（元数据修复 + 代码级补丁 replace_code）仅适用于不超过 204800 字节的脚本；每项改动必须可由 HTTP 实测或代码行号复核。",
+    "upstream_check_note": "每周审查对全部脚本（含 > 200 KiB）核对上游版本，并判断更新内容属于优化还是回归。"
   },
   "patches": {
     "AC-baidu-Redirect": {
@@ -34,6 +35,17 @@
       ],
       "add_grant": ["GM_info"],
       "grant_reason": "脚本第 448 行使用 const { name, version } = GM_info.script，但 @grant 未声明 GM_info。"
+    },
+    "GitHub-Zh-CN": {
+      "version_bump": "2.18.5",
+      "replace_code": [
+        {
+          "name": "search-guard-trusted-input",
+          "old": "      if (!isSearchInput(el)) return;\n      const v = el.value || '';\n      if (!CJK.test(v)) lastTyped.set(el, v);",
+          "new": "      if (!isSearchInput(el) || !e.isTrusted) return;\n      lastTyped.set(el, el.value || '');",
+          "reason": "上游 2.18.4 的搜索框守护只记录非中文输入：用户先输入英文、再输入中文时，中文会在 500ms 内被还原为旧值（脚本第 3033–3054 行）。改为只信任用户真实输入（e.isTrusted）后，中文输入会更新基准值，而脚本注入的中文仍会被还原。"
+        }
+      ]
     }
   },
   "meta_slim": {
@@ -52,11 +64,6 @@
       "script": "CSDNGreener",
       "issue": "@require 的 jquery-cookie、nprogress 在代码中未检出使用",
       "why_not_fixed": "检测方法存在假阴性风险（已在 AC-baidu 的 Vue 依赖上验证过误判），删除依赖收益（省 2 个请求）低于误删导致功能损坏的风险，按「保证功能完整」原则保留。"
-    },
-    {
-      "script": "GitHub-Zh-CN",
-      "issue": "上游 2.18.4 的搜索框守护可能在已有非中文输入记录时误还原后续中文输入（第 3033–3054 行）",
-      "why_not_fixed": "属于上游新增主体逻辑，按第三方代码零改动原则不在本地修补，等待上游修正。"
     }
   ]
 }

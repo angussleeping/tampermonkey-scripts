@@ -227,14 +227,14 @@
       "meta_file": "GitHub-Zh-CN.meta.js",
       "name": "GitHub 中文化（最全翻译版）",
       "author": "Yujan",
-      "version": "2.18.4",
+      "version": "2.18.5",
       "original_version": "2.18.4",
       "license": "GPL-3.0",
       "category": "GitHub 增强",
       "summary": "像「沉浸式翻译」那样把 GitHub 界面与内容译成简体中文，覆盖导航、弹窗、README、Issue、PR 等。",
       "origin": "third_party",
       "enabled": true,
-      "size_bytes": 204779,
+      "size_bytes": 204758,
       "upstream_meta": "https://update.greasyfork.org/scripts/602755/GitHub%20%E4%B8%AD%E6%96%87%E5%8C%96%EF%BC%88%E6%9C%80%E5%85%A8%E7%BF%BB%E8%AF%91%E7%89%88%EF%BC%89.meta.js",
       "upstream_download": "https://update.greasyfork.org/scripts/602755/GitHub%20%E4%B8%AD%E6%96%87%E5%8C%96%EF%BC%88%E6%9C%80%E5%85%A8%E7%BF%BB%E8%AF%91%E7%89%88%EF%BC%89.user.js",
       "upstream_page": "https://greasyfork.org/scripts/602755",
@@ -243,10 +243,19 @@
       "match_count": 5,
       "namespace": "https://greasyfork.org/zh-CN/scripts/602755",
       "version_normalized": false,
-      "optimized": false,
-      "optimizations": [],
+      "optimized": true,
+      "optimizations": [
+        {
+          "field": "code",
+          "name": "search-guard-trusted-input",
+          "old": "if (!CJK.test(v)) lastTyped.set(el, v);",
+          "new": "if (!isSearchInput(el) || !e.isTrusted) return; lastTyped.set(el, el.value || '');",
+          "reason": "上游 2.18.4 搜索框守护只记录非中文输入，用户先输入英文再输入中文时中文会被 500ms 还原为旧值（第 3033–3054 行）；改为只信任真实用户输入后修复。"
+        }
+      ],
       "meta_bytes": 2202,
-      "oversize": false
+      "oversize": false,
+      "version_bumped_from": "2.18.4"
     },
     {
       "file": "Skip-Progress-Bar.user.js",
