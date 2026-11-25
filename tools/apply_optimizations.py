@@ -54,17 +54,19 @@ for entry in man['scripts']:
     applied = []
 
     if opt:
-        # ---- 1. 版本提升 ----
+        # ---- 1. 版本提升（只增不减：补丁表版本低于仓库现有版本时保持现有版本） ----
         bump = (opt.get('version_bump') or '').strip()
-        if bump:
-            m = re.search(r'//[ \t]*@version[ \t]+(\S+)', code)
-            cur = m.group(1) if m else ''
-            if cur != bump:
-                code = re.sub(r'(//[ \t]*@version[ \t]+)\S+', lambda mm: mm.group(1) + bump, code, count=1)
-                if not entry.get('version_bumped_from'):
-                    entry['version_bumped_from'] = cur
-                print('  [ver ] %-44s %s -> %s' % (slug, cur, bump))
-            entry['version'] = bump
+        m = re.search(r'//[ \t]*@version[ \t]+(\S+)', code)
+        cur = m.group(1) if m else ''
+        if bump and B.is_version_newer(bump, cur):
+            code = re.sub(r'(//[ \t]*@version[ \t]+)\S+', lambda mm: mm.group(1) + bump, code, count=1)
+            if not entry.get('version_bumped_from'):
+                entry['version_bumped_from'] = cur
+            print('  [ver ] %-44s %s -> %s' % (slug, cur, bump))
+            cur = bump
+        elif bump and bump != cur:
+            print('  [keep] %-43s 现有 %s 已高于补丁表 %s，不降级' % (slug, cur, bump))
+        entry['version'] = cur or bump
 
         # ---- 2. 元数据替换 ----
         for rep in (opt.get('replace_meta') or []):
@@ -142,15 +144,12 @@ for entry in man['scripts']:
     write_code(spath, code)
 
     # ---- 4. 重新生成 meta ----
-    # 大型脚本（> 200 KiB）按约定完全不动，meta 也保持原样；
-    # 其余脚本的 meta 精简（仅保留版本判断所需字段）。
+    # meta 只用于篡改猴比对 @version，与脚本体积无关：大型脚本同样精简，
+    # 剔除 data URI 图标、@resource、@note 等字段以减少每周检查更新的流量。
     mb = re.search(r'// ==UserScript==.*?// ==/UserScript==', code, re.S)
     meta_text = mb.group(0) if mb else code
     mnl = '\r\n' if '\r\n' in meta_text else '\n'
-    if size_now > THRESHOLD:
-        slimmed = meta_text
-    else:
-        slimmed = B.slim_meta(meta_text, SLIM)
+    slimmed = B.slim_meta(meta_text, SLIM)
     payload = (slimmed.rstrip('\r\n') + mnl).encode('utf-8')
     with open(mpath, 'wb') as f:
         f.write(payload)

@@ -131,6 +131,19 @@ def norm_version(v):
     return '.'.join(parts)
 
 
+def version_numbers(v):
+    return [int(x) for x in re.findall(r'\d+', norm_version(v or ''))] or [0]
+
+
+def is_version_newer(a, b):
+    """按数字段比较版本号，a 严格大于 b 时返回 True（用于「版本只增不减」）。"""
+    left, right = version_numbers(a), version_numbers(b)
+    width = max(len(left), len(right))
+    left += [0] * (width - len(left))
+    right += [0] * (width - len(right))
+    return left > right
+
+
 def detect_newline(lines):
     for l in lines:
         if l.endswith('\r\n'):
@@ -459,26 +472,25 @@ def write_readme(root, doc):
     L.append('')
     L.append('## 一、一次性配置（只做一次）')
     L.append('')
-    L.append('仓库里的脚本已经把 `@updateURL` / `@downloadURL` 指向本仓库的 raw 地址。**要让篡改猴改用这个地址，需要你操作一次**：')
+    L.append('仓库里的脚本已经把 `@updateURL` / `@downloadURL` 指向本仓库的 jsDelivr CDN 地址（`raw.githubusercontent.com` 在部分网络下会被拦截）。**要让篡改猴改用这个地址，需要你操作一次**：')
     L.append('')
-    L.append('1. 打开篡改猴管理面板 → 「实用工具」→「导入」，选择本仓库 `scripts/` 下的 `.user.js`（或直接把 raw 链接粘进浏览器地址栏安装）；')
+    L.append('1. 打开篡改猴管理面板 → 「实用工具」→「导入」，选择本仓库 `scripts/` 下的 `.user.js`（或直接把下文的 CDN 下载链接粘进浏览器地址栏安装）；')
     L.append('2. 覆盖安装同名脚本即可。**`@namespace` 与 `@name` 均保持原样**，篡改猴会识别为同一个脚本，你原有的菜单设置与 `GM_setValue` 数据不会丢失；')
     L.append('3. 之后每周任务提交新版本时，篡改猴会自动检测到版本号变化并更新（也可在管理面板点「检查更新」手动触发）。')
     L.append('')
-    L.append('> 每个脚本有两个地址：`@updateURL` 指向 `meta/` 下轻量的 `.meta.js`（只含元数据，用于检查版本），`@downloadURL` 指向 `scripts/` 下完整的 `.user.js`。')
-    L.append('> 如果 `raw.githubusercontent.com` 在你的网络下不可用，可把这两个地址整体替换为 jsDelivr 镜像：')
+    L.append('> 每个脚本有两个地址：`@updateURL` 指向 `meta/` 下轻量的 `.meta.js`（只含元数据，用于检查版本），`@downloadURL` 指向 `scripts/` 下完整的 `.user.js`，两者都走 jsDelivr：')
     L.append('> `https://cdn.jsdelivr.net/gh/%s@%s/meta/<文件名>.meta.js` 与 `https://cdn.jsdelivr.net/gh/%s@%s/scripts/<文件名>.user.js`' % (REPO, BRANCH, REPO, BRANCH))
+    L.append('> jsDelivr 对 `@master` 分支引用有约 12 小时缓存，推送后最长需等待半天才能被「检查更新」看到；急用时可用 raw 地址手动安装。')
     L.append('')
     L.append('## 二、每周自动更新机制')
     L.append('')
     L.append('```')
-    L.append('每周定时触发')
-    L.append('  ├─ 1. 读取 scripts-manifest.json，按 upstream_meta / upstream_download 核对**全部脚本**（含 > 200 KiB）的上游版本')
-    L.append('  ├─ 2. 上游有更新 → 拉取新版、做语法校验与差异对比，判断改动属于优化还是回归')
-    L.append('  ├─ 3. 分析与优化：本地优化只针对 ≤ 200 KiB 的脚本（自有脚本可直接改；第三方仅做最小补丁）；> 200 KiB 只原样跟随上游')
-    L.append('  ├─ 4. 识别篡改猴中新增的脚本（读取最新导出文件或扩展存储），纳入本仓库')
-    L.append('  ├─ 5. 提升版本号、更新 README / CHANGELOG / manifest，提交到 GitHub')
-    L.append('  └─ 6. 篡改猴通过 @updateURL 检测到新版本 → 自动更新到本地')
+    L.append('每周定时触发（`.github/workflows/weekly-sync.yml`，每周一 02:00 UTC；也可在 Actions 页手动运行）')
+    L.append('  ├─ 1. tools/sync_upstream.py：读取 scripts-manifest.json，按 upstream_download 核对**全部脚本**（含 > 200 KiB）的上游 @version')
+    L.append('  ├─ 2. 上游有更新 → 拉取新版，校验脚本格式后重放 tools/optimizations.json 的补丁，并把版本号提升到严格大于当前仓库版本')
+    L.append('  ├─ 3. tools/apply_optimizations.py：重建 meta/*.meta.js、README、CHANGELOG，补齐 @grant 与失效依赖地址')
+    L.append('  ├─ 4. 自动提交并推送；篡改猴通过 @updateURL 检测到新版本 → 自动更新到本地')
+    L.append('  └─ 手动：新增脚本仍需从篡改猴导出，再运行 tools/build_from_export.py 纳入仓库')
     L.append('```')
     L.append('')
     L.append('**关于「优化」的边界（重要）**：')
@@ -652,7 +664,7 @@ def _changelog_opt_block(doc):
         return []
     tp = sum(1 for m in doc['scripts'] if m['origin'] == 'third_party')
     L = ['## %s — 第三方脚本元数据审查与优化' % doc['generated_at'], '']
-    L.append('按「> 200 KiB 视为大型脚本、不做改动」的阈值，对 %d 个第三方脚本做了依赖与元数据的实证检查（HTTP 实测 + 代码行号比对）。' % tp)
+    L.append('按「> 200 KiB 视为大型脚本、只跟随上游不改代码」的阈值，对 %d 个第三方脚本做了依赖与元数据的实证检查（HTTP 实测 + 代码行号比对）。' % tp)
     L.append('')
     for m in om:
         fr = m.get('version_bumped_from') or m['original_version']
@@ -665,7 +677,7 @@ def _changelog_opt_block(doc):
                 tag = (' `%s`' % o['name']) if o.get('name') else ''
                 L.append('- `@%s`%s：`%s` → `%s`。%s' % (o['field'], tag, o['old'], o['new'], o['reason']))
         L.append('')
-    over = [m for m in doc['scripts'] if m.get('oversize')]
+    over = [m for m in doc['scripts'] if m.get('oversize') and not m.get('optimized')]
     if over:
         L.append('### 未改动（大型脚本）')
         L.append('')

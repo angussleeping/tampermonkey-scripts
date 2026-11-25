@@ -1,0 +1,71 @@
+name: 每周上游同步与优化
+
+on:
+  schedule:
+    # 每周一 02:00 UTC（北京时间 10:00）
+    - cron: '0 2 * * 1'
+  workflow_dispatch:
+    inputs:
+      only:
+        description: '只同步指定脚本（留空表示全部，例如 Bilibili-Evolved）'
+        required: false
+        default: ''
+
+permissions:
+  contents: write
+
+concurrency:
+  group: weekly-upstream-sync
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: 检出仓库
+        uses: actions/checkout@v4
+
+      - name: 准备 Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: 拉取上游并应用补丁
+        env:
+          ONLY: ${{ inputs.only }}
+        run: |
+          if [ -n "$ONLY" ]; then
+            python tools/sync_upstream.py --only "$ONLY"
+          else
+            python tools/sync_upstream.py
+          fi
+
+      - name: 重建 meta / README / CHANGELOG
+        run: python tools/apply_optimizations.py
+
+      - name: 提交并推送
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "上游没有新版本，本次不提交。"
+            exit 0
+          fi
+          git diff --cached --stat
+          git commit -m "chore(sync): 每周上游同步与优化（$(date -u +%F)）"
+          git push
+
+      - name: 同步摘要
+        if: always()
+        run: |
+          {
+            echo "### 每周上游同步"
+            echo ''
+            echo '```'
+            git log -1 --pretty=format:'%h %s' || true
+            echo ''
+            git diff HEAD~1 --stat || true
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"

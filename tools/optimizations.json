@@ -1,7 +1,7 @@
 {
   "_note": "脚本优化补丁表。build_from_export.py / apply_optimizations.py 重建与同步时自动重放，避免从篡改猴重新导出后丢失。仅允许对不超过 200 KiB 的脚本改元数据（replace_meta / add_grant）与做最小代码补丁（replace_code）；> 200 KiB 的脚本只跟随上游、不改代码。",
   "version": 1,
-  "updated_at": "2026-11-24",
+  "updated_at": "2026-11-25",
   "policy": {
     "large_script_threshold_bytes": 204800,
     "large_script_note": "字节数 > 204800（200 KiB）视为大型成熟项目：每周仍核对上游版本，有更新则原样同步，但不在本地修改代码。",
@@ -9,6 +9,29 @@
     "upstream_check_note": "每周审查对全部脚本（含 > 200 KiB）核对上游版本，并判断更新内容属于优化还是回归。"
   },
   "patches": {
+    "Bilibili-Evolved": {
+      "version_bump": "2.12.2",
+      "replace_meta": [
+        {
+          "field": "require",
+          "old": "https://raw.githubusercontent.com/lodash/lodash/4.17.21/dist/lodash.min.js#sha256=a9705dfc47c0763380d851ab1801be6f76019f6b67e40e9b873f8b4a0603f7a9",
+          "new": "https://cdn.jsdelivr.net/npm/lodash@4.17.21/lodash.min.js#sha256=a9705dfc47c0763380d851ab1801be6f76019f6b67e40e9b873f8b4a0603f7a9",
+          "reason": "raw.githubusercontent.com 在本机实测 HTTP 500（被墙），lodash 加载失败会导致篡改猴放弃注入整个脚本，表现为 Edge 中哔哩哔哩页面完全没有 Bilibili Evolved 面板。jsDelivr 镜像实测 HTTP 200，SHA-256 与 @require 声明的 a9705dfc… 完全一致，功能与校验强度不变。"
+        },
+        {
+          "field": "icon",
+          "old": "https://raw.githubusercontent.com/the1812/Bilibili-Evolved/preview/images/logo-small.png",
+          "new": "https://cdn.jsdelivr.net/gh/the1812/Bilibili-Evolved@preview/images/logo-small.png",
+          "reason": "同域名被墙，图标 404/超时；仅影响脚本管理面板图标，换成 jsDelivr 镜像无副作用。"
+        },
+        {
+          "field": "icon64",
+          "old": "https://raw.githubusercontent.com/the1812/Bilibili-Evolved/preview/images/logo.png",
+          "new": "https://cdn.jsdelivr.net/gh/the1812/Bilibili-Evolved@preview/images/logo.png",
+          "reason": "同上。"
+        }
+      ]
+    },
     "AC-baidu-Redirect": {
       "version_bump": "27.21",
       "replace_meta": [

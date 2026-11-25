@@ -5,7 +5,7 @@
   "meta_base": "https://cdn.jsdelivr.net/gh/angussleeping/tampermonkey-scripts@master/meta/",
   "repo_url": "https://github.com/angussleeping/tampermonkey-scripts",
   "export_source": "篡改猴脚本集合.txt",
-  "generated_at": "2026-11-24",
+  "generated_at": "2026-11-25",
   "script_count": 14,
   "scripts": [
     {
@@ -20,7 +20,7 @@
       "summary": "为 GitHub 增加额外功能，增强页面交互与信息展示。",
       "origin": "third_party",
       "enabled": true,
-      "size_bytes": 60656,
+      "size_bytes": 62104,
       "upstream_meta": "https://update.greasyfork.org/scripts/510742/GitHub%20Plus.meta.js",
       "upstream_download": "https://update.greasyfork.org/scripts/510742/GitHub%20Plus.user.js",
       "upstream_page": "https://greasyfork.org/scripts/510742",
@@ -47,7 +47,7 @@
           "reason": "脚本第 448 行使用 const { name, version } = GM_info.script，但 @grant 未声明 GM_info。"
         }
       ],
-      "meta_bytes": 1459,
+      "meta_bytes": 1489,
       "oversize": false
     },
     {
@@ -62,7 +62,7 @@
       "summary": "绕过百度 / 搜狗 / 谷歌 / 必应搜索结果的跳转链接，直达原始网页；附带 favicon 显示与双列布局。",
       "origin": "third_party",
       "enabled": true,
-      "size_bytes": 130028,
+      "size_bytes": 132966,
       "upstream_meta": "https://update.greasyfork.org/scripts/14178/AC-baidu-%E9%87%8D%E5%AE%9A%E5%90%91%E4%BC%98%E5%8C%96%E7%99%BE%E5%BA%A6%E6%90%9C%E7%8B%97%E8%B0%B7%E6%AD%8C%E5%BF%85%E5%BA%94%E6%90%9C%E7%B4%A2_favicon_%E5%8F%8C%E5%88%97.meta.js",
       "upstream_download": "https://update.greasyfork.org/scripts/14178/AC-baidu-%E9%87%8D%E5%AE%9A%E5%90%91%E4%BC%98%E5%8C%96%E7%99%BE%E5%BA%A6%E6%90%9C%E7%8B%97%E8%B0%B7%E6%AD%8C%E5%BF%85%E5%BA%94%E6%90%9C%E7%B4%A2_favicon_%E5%8F%8C%E5%88%97.user.js",
       "upstream_page": "https://greasyfork.org/zh-TW/scripts/14178",
@@ -89,7 +89,7 @@
           "reason": "脚本第 405 行使用 GM_info.script.version，但 @grant 未声明 GM_info；在严格实现的管理器中该 API 不可用，会抛 TypeError。"
         }
       ],
-      "meta_bytes": 4066,
+      "meta_bytes": 4143,
       "oversize": false
     },
     {
@@ -104,7 +104,7 @@
       "summary": "自动提取并填写网盘分享链接中的访问码，打开即自动提交，免去手动复制；并会记录已访问过的网盘信息。",
       "origin": "third_party",
       "enabled": true,
-      "size_bytes": 92595,
+      "size_bytes": 94205,
       "upstream_meta": "https://update.greasyfork.org/scripts/29762/%E7%BD%91%E7%9B%98%E8%87%AA%E5%8A%A8%E5%A1%AB%E5%86%99%E8%AE%BF%E9%97%AE%E7%A0%81%E3%80%90%E5%A8%81%E5%8A%9B%E5%8A%A0%E5%BC%BA%E7%89%88%E3%80%91.meta.js",
       "upstream_download": "https://update.greasyfork.org/scripts/29762/%E7%BD%91%E7%9B%98%E8%87%AA%E5%8A%A8%E5%A1%AB%E5%86%99%E8%AE%BF%E9%97%AE%E7%A0%81%E3%80%90%E5%A8%81%E5%8A%9B%E5%8A%A0%E5%BC%BA%E7%89%88%E3%80%91.user.js",
       "upstream_page": "https://greasyfork.org/scripts/29762",
@@ -115,7 +115,7 @@
       "version_normalized": false,
       "optimized": false,
       "optimizations": [],
-      "meta_bytes": 3156,
+      "meta_bytes": 3219,
       "oversize": false,
       "version_bumped_from": "3.25.41.2"
     },
@@ -131,7 +131,7 @@
       "summary": "GitHub 高速下载：为 Git Clone/SSH、Release、Raw、Code(ZIP) 等提供加速与便捷入口。",
       "origin": "third_party",
       "enabled": true,
-      "size_bytes": 43310,
+      "size_bytes": 43823,
       "upstream_meta": "https://update.greasyfork.org/scripts/412245/Github%20%E5%A2%9E%E5%BC%BA%20-%20%E9%AB%98%E9%80%9F%E4%B8%8B%E8%BD%BD.meta.js",
       "upstream_download": "https://update.greasyfork.org/scripts/412245/Github%20%E5%A2%9E%E5%BC%BA%20-%20%E9%AB%98%E9%80%9F%E4%B8%8B%E8%BD%BD.user.js",
       "upstream_page": "https://github.com/XIU2/UserScript",
@@ -142,7 +142,7 @@
       "version_normalized": false,
       "optimized": false,
       "optimizations": [],
-      "meta_bytes": 2284,
+      "meta_bytes": 2317,
       "oversize": false,
       "version_bumped_from": "2.6.41"
     },
@@ -158,7 +158,7 @@
       "summary": "自动无缝翻页，把下一页内容追加到当前页底部（瀑布流式浏览）。",
       "origin": "third_party",
       "enabled": true,
-      "size_bytes": 187333,
+      "size_bytes": 190317,
       "upstream_meta": "https://update.greasyfork.org/scripts/419215/%E8%87%AA%E5%8A%A8%E6%97%A0%E7%BC%9D%E7%BF%BB%E9%A1%B5.meta.js",
       "upstream_download": "https://update.greasyfork.org/scripts/419215/%E8%87%AA%E5%8A%A8%E6%97%A0%E7%BC%9D%E7%BF%BB%E9%A1%B5.user.js",
       "upstream_page": "https://github.com/XIU2/UserScript",
@@ -169,7 +169,7 @@
       "version_normalized": false,
       "optimized": false,
       "optimizations": [],
-      "meta_bytes": 4875,
+      "meta_bytes": 4968,
       "oversize": false,
       "version_bumped_from": "6.6.75"
     },
@@ -185,7 +185,7 @@
       "summary": "网盘文件下载地址获取工具，基于「网盘直链下载助手」修改，支持多种网盘。",
       "origin": "third_party",
       "enabled": true,
-      "size_bytes": 576381,
+      "size_bytes": 584749,
       "upstream_meta": "",
       "upstream_download": "https://scriptcat.org/scripts/code/1604/LinkSwift.user.js",
       "upstream_page": "https://github.com/hmjz100/LinkSwift/",
@@ -196,7 +196,7 @@
       "version_normalized": false,
       "optimized": false,
       "optimizations": [],
-      "meta_bytes": 6323,
+      "meta_bytes": 6428,
       "oversize": true,
       "version_bumped_from": "1.1.3"
     },
@@ -205,14 +205,14 @@
       "meta_file": "Bilibili-Evolved.meta.js",
       "name": "Bilibili Evolved",
       "author": "Grant Howard, Coulomb-G",
-      "version": "2.12.1",
+      "version": "2.12.2",
       "original_version": "2.12.0",
       "license": "MIT",
       "category": "站点增强 · 哔哩哔哩",
       "summary": "功能全面的哔哩哔哩增强脚本，提供大量可配置的界面与功能改进。",
       "origin": "third_party",
       "enabled": true,
-      "size_bytes": 1463558,
+      "size_bytes": 1463653,
       "upstream_meta": "https://raw.githubusercontent.com/the1812/Bilibili-Evolved/master/dist/bilibili-evolved.user.js",
       "upstream_download": "https://raw.githubusercontent.com/the1812/Bilibili-Evolved/master/dist/bilibili-evolved.user.js",
       "upstream_page": "https://github.com/the1812/Bilibili-Evolved",
@@ -221,9 +221,31 @@
       "match_count": 1,
       "namespace": "",
       "version_normalized": false,
-      "optimized": false,
-      "optimizations": [],
-      "meta_bytes": 2704,
+      "optimized": true,
+      "optimizations": [
+        {
+          "field": "require",
+          "name": "",
+          "old": "https://raw.githubusercontent.com/lodash/lodash/4.17.21/dist/lodash.min.js#sha256=a9705dfc47c0763380d851ab1801be6f76019f6b67e40e9b873f8b4a0603f7a9",
+          "new": "https://cdn.jsdelivr.net/npm/lodash@4.17.21/lodash.min.js#sha256=a9705dfc47c0763380d851ab1801be6f76019f6b67e40e9b873f8b4a0603f7a9",
+          "reason": "raw.githubusercontent.com 在本机实测 HTTP 500（被墙），lodash 加载失败会导致篡改猴放弃注入整个脚本，表现为 Edge 中哔哩哔哩页面完全没有 Bilibili Evolved 面板。jsDelivr 镜像实测 HTTP 200，SHA-256 与 @require 声明的 a9705dfc… 完全一致，功能与校验强度不变。"
+        },
+        {
+          "field": "icon",
+          "name": "",
+          "old": "https://raw.githubusercontent.com/the1812/Bilibili-Evolved/preview/images/logo-small.png",
+          "new": "https://cdn.jsdelivr.net/gh/the1812/Bilibili-Evolved@preview/images/logo-small.png",
+          "reason": "同域名被墙，图标 404/超时；仅影响脚本管理面板图标，换成 jsDelivr 镜像无副作用。"
+        },
+        {
+          "field": "icon64",
+          "name": "",
+          "old": "https://raw.githubusercontent.com/the1812/Bilibili-Evolved/preview/images/logo.png",
+          "new": "https://cdn.jsdelivr.net/gh/the1812/Bilibili-Evolved@preview/images/logo.png",
+          "reason": "同上。"
+        }
+      ],
+      "meta_bytes": 2726,
       "oversize": true,
       "version_bumped_from": "2.12.0"
     },
@@ -239,7 +261,7 @@
       "summary": "像「沉浸式翻译」那样把 GitHub 界面与内容译成简体中文，覆盖导航、弹窗、README、Issue、PR 等。",
       "origin": "third_party",
       "enabled": true,
-      "size_bytes": 204746,
+      "size_bytes": 207840,
       "upstream_meta": "https://update.greasyfork.org/scripts/602755/GitHub%20%E4%B8%AD%E6%96%87%E5%8C%96%EF%BC%88%E6%9C%80%E5%85%A8%E7%BF%BB%E8%AF%91%E7%89%88%EF%BC%89.meta.js",
       "upstream_download": "https://update.greasyfork.org/scripts/602755/GitHub%20%E4%B8%AD%E6%96%87%E5%8C%96%EF%BC%88%E6%9C%80%E5%85%A8%E7%BF%BB%E8%AF%91%E7%89%88%EF%BC%89.user.js",
       "upstream_page": "https://greasyfork.org/scripts/602755",
@@ -248,18 +270,10 @@
       "match_count": 5,
       "namespace": "https://greasyfork.org/zh-CN/scripts/602755",
       "version_normalized": false,
-      "optimized": true,
-      "optimizations": [
-        {
-          "field": "code",
-          "name": "search-guard-trusted-input",
-          "old": "if (!CJK.test(v)) lastTyped.set(el, v);",
-          "new": "if (!isSearchInput(el) || !e.isTrusted) return; lastTyped.set(el, el.value || '');",
-          "reason": "上游 2.18.4 搜索框守护只记录非中文输入，用户先输入英文再输入中文时中文会被 500ms 还原为旧值（第 3033–3054 行）；改为只信任真实用户输入后修复。"
-        }
-      ],
-      "meta_bytes": 2190,
-      "oversize": false,
+      "optimized": false,
+      "optimizations": [],
+      "meta_bytes": 2226,
+      "oversize": true,
       "version_bumped_from": "2.18.5"
     },
     {
@@ -274,7 +288,7 @@
       "summary": "跳过各类跳转进度条直接加载目标网页，并优化 / 移除重定向链接；参数可高度自定义。",
       "origin": "third_party",
       "enabled": true,
-      "size_bytes": 134617,
+      "size_bytes": 136880,
       "upstream_meta": "https://update.greasyfork.org/scripts/493851/%E2%AD%90%E7%BD%91%E9%A1%B5%E7%9E%AC%E9%97%B4%E5%8A%A0%E8%BD%BD%E8%B7%B3%E8%BF%87%E8%BF%9B%E5%BA%A6%E6%9D%A1%E7%9B%B4%E6%8E%A5%E5%8A%A0%E8%BD%BD%E7%BD%91%E9%A1%B5%EF%BC%88%E9%99%84%E9%87%8D%E5%AE%9A%E5%90%91%E9%93%BE%E6%8E%A5%E4%BC%98%E5%8C%96%EF%BC%89%E2%AD%90.meta.js",
       "upstream_download": "https://update.greasyfork.org/scripts/493851/%E2%AD%90%E7%BD%91%E9%A1%B5%E7%9E%AC%E9%97%B4%E5%8A%A0%E8%BD%BD%E8%B7%B3%E8%BF%87%E8%BF%9B%E5%BA%A6%E6%9D%A1%E7%9B%B4%E6%8E%A5%E5%8A%A0%E8%BD%BD%E7%BD%91%E9%A1%B5%EF%BC%88%E9%99%84%E9%87%8D%E5%AE%9A%E5%90%91%E9%93%BE%E6%8E%A5%E4%BC%98%E5%8C%96%EF%BC%89%E2%AD%90.user.js",
       "upstream_page": "https://greasyfork.org/scripts/493851",
@@ -285,7 +299,7 @@
       "version_normalized": false,
       "optimized": false,
       "optimizations": [],
-      "meta_bytes": 1300,
+      "meta_bytes": 1318,
       "oversize": false,
       "version_bumped_from": "1.0.15"
     },
@@ -301,7 +315,7 @@
       "summary": "批量下载公开免费的 PPT、PDF、DOC、TXT 等文库文档，覆盖众多文库站点。",
       "origin": "third_party",
       "enabled": true,
-      "size_bytes": 76852,
+      "size_bytes": 79540,
       "upstream_meta": "https://update.greasyfork.org/scripts/486211/%E3%80%90%E6%9C%80%E5%BC%BA%E6%97%A0%E5%A5%97%E8%B7%AF%E8%84%9A%E6%9C%AC%E3%80%91%E4%BD%A0%E8%83%BD%E7%9C%8B%E8%A7%81%E5%A4%9A%E5%B0%91%E6%88%91%E8%83%BD%E4%B8%8B%E8%BD%BD%E5%A4%9A%E5%B0%91%E4%B8%8B%E8%BD%BD%E5%85%AC%E5%BC%80%E5%85%8D%E8%B4%B9%E7%9A%84PPT%E3%80%81PDF%E3%80%81DOC%E3%80%81TXT%E7%AD%89%E6%96%87%E4%BB%B6.meta.js",
       "upstream_download": "https://update.greasyfork.org/scripts/486211/%E3%80%90%E6%9C%80%E5%BC%BA%E6%97%A0%E5%A5%97%E8%B7%AF%E8%84%9A%E6%9C%AC%E3%80%91%E4%BD%A0%E8%83%BD%E7%9C%8B%E8%A7%81%E5%A4%9A%E5%B0%91%E6%88%91%E8%83%BD%E4%B8%8B%E8%BD%BD%E5%A4%9A%E5%B0%91%E4%B8%8B%E8%BD%BD%E5%85%AC%E5%BC%80%E5%85%8D%E8%B4%B9%E7%9A%84PPT%E3%80%81PDF%E3%80%81DOC%E3%80%81TXT%E7%AD%89%E6%96%87%E4%BB%B6.user.js",
       "upstream_page": "https://greasyfork.org/scripts/486211",
@@ -312,7 +326,7 @@
       "version_normalized": false,
       "optimized": false,
       "optimizations": [],
-      "meta_bytes": 4394,
+      "meta_bytes": 4467,
       "oversize": false,
       "version_bumped_from": "7.8"
     },
@@ -328,7 +342,7 @@
       "summary": "CSDN 广告完全过滤、免登录复制、个性化排版；5.0 起为模块化重构版本。",
       "origin": "third_party",
       "enabled": true,
-      "size_bytes": 152501,
+      "size_bytes": 156053,
       "upstream_meta": "https://update.greasyfork.org/scripts/378351/%E3%80%8CCSDNGreener%E3%80%8D%F0%9F%8D%83CSDN%E5%B9%BF%E5%91%8A%E5%AE%8C%E5%85%A8%E8%BF%87%E6%BB%A4%7C%E5%85%8D%E7%99%BB%E5%BD%95%7C%E4%B8%AA%E6%80%A7%E5%8C%96%E6%8E%92%E7%89%88%7C%E6%9C%80%E5%BC%BA%E8%80%81%E7%89%8C%E8%84%9A%E6%9C%AC%7C%E6%8C%81%E7%BB%AD%E6%9B%B4%E6%96%B0.meta.js",
       "upstream_download": "https://update.greasyfork.org/scripts/378351/%E3%80%8CCSDNGreener%E3%80%8D%F0%9F%8D%83CSDN%E5%B9%BF%E5%91%8A%E5%AE%8C%E5%85%A8%E8%BF%87%E6%BB%A4%7C%E5%85%8D%E7%99%BB%E5%BD%95%7C%E4%B8%AA%E6%80%A7%E5%8C%96%E6%8E%92%E7%89%88%7C%E6%9C%80%E5%BC%BA%E8%80%81%E7%89%8C%E8%84%9A%E6%9C%AC%7C%E6%8C%81%E7%BB%AD%E6%9B%B4%E6%96%B0.user.js",
       "upstream_page": "https://greasyfork.org/scripts/378351",
@@ -339,7 +353,7 @@
       "version_normalized": false,
       "optimized": false,
       "optimizations": [],
-      "meta_bytes": 2078,
+      "meta_bytes": 2103,
       "oversize": false,
       "version_bumped_from": "5.0.5"
     },
@@ -355,7 +369,7 @@
       "summary": "自动拦截或删除下载弹窗、悬浮按钮等干扰元素，覆盖 CSDN、简书、知乎、百度等大量站点。",
       "origin": "third_party",
       "enabled": true,
-      "size_bytes": 37996,
+      "size_bytes": 39225,
       "upstream_meta": "https://update.greasyfork.org/scripts/440871/%E9%AA%9A%E6%89%B0%E6%8B%A6%E6%88%AA.meta.js",
       "upstream_download": "https://update.greasyfork.org/scripts/440871/%E9%AA%9A%E6%89%B0%E6%8B%A6%E6%88%AA.user.js",
       "upstream_page": "https://github.com/AirBashX/UserScript",
@@ -366,7 +380,7 @@
       "version_normalized": false,
       "optimized": false,
       "optimizations": [],
-      "meta_bytes": 4439,
+      "meta_bytes": 4523,
       "oversize": false,
       "version_bumped_from": "1.5.9"
     },
@@ -382,7 +396,7 @@
       "summary": "自动切到「最新微博」按实际时间排序；隐藏信息流中的「荐读」卡片并让下方微博上移补齐空位。",
       "origin": "self",
       "enabled": true,
-      "size_bytes": 9445,
+      "size_bytes": 9671,
       "upstream_meta": "",
       "upstream_download": "",
       "upstream_page": "",
@@ -393,7 +407,7 @@
       "version_normalized": false,
       "optimized": false,
       "optimizations": [],
-      "meta_bytes": 1071,
+      "meta_bytes": 1090,
       "oversize": false,
       "version_bumped_from": "1.0.1"
     },
@@ -409,7 +423,7 @@
       "summary": "去掉知乎广告并提供沉浸模式（隐藏侧栏、主栏加宽）；与「知乎增强」脚本共存、功能互补。",
       "origin": "self",
       "enabled": true,
-      "size_bytes": 9298,
+      "size_bytes": 9474,
       "upstream_meta": "",
       "upstream_download": "",
       "upstream_page": "",
@@ -420,7 +434,7 @@
       "version_normalized": true,
       "optimized": false,
       "optimizations": [],
-      "meta_bytes": 1272,
+      "meta_bytes": 1291,
       "oversize": false,
       "version_bumped_from": "2.1.1"
     }

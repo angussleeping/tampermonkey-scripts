@@ -4,13 +4,13 @@
 
 - **仓库**：[angussleeping/tampermonkey-scripts](https://github.com/angussleeping/tampermonkey-scripts)
 - **脚本数量**：14 个（12 个第三方 / 2 个自有）
-- **最近同步**：2026-11-24
+- **最近同步**：2026-11-25
 
 ---
 
 ## 一、一次性配置（只做一次）
 
-仓库里的脚本已经把 `@updateURL` / `@downloadURL` 指向本仓库的 jsDelivr CDN 地址（`raw.githubusercontent.com` 在部分网络下会被代理拦截）。**要让篡改猴改用这个地址，需要你操作一次**：
+仓库里的脚本已经把 `@updateURL` / `@downloadURL` 指向本仓库的 jsDelivr CDN 地址（`raw.githubusercontent.com` 在部分网络下会被拦截）。**要让篡改猴改用这个地址，需要你操作一次**：
 
 1. 打开篡改猴管理面板 → 「实用工具」→「导入」，选择本仓库 `scripts/` 下的 `.user.js`（或直接把下文的 CDN 下载链接粘进浏览器地址栏安装）；
 2. 覆盖安装同名脚本即可。**`@namespace` 与 `@name` 均保持原样**，篡改猴会识别为同一个脚本，你原有的菜单设置与 `GM_setValue` 数据不会丢失；
@@ -23,19 +23,18 @@
 ## 二、每周自动更新机制
 
 ```
-每周定时触发
-  ├─ 1. 读取 scripts-manifest.json，按 upstream_meta / upstream_download 核对**全部脚本**（含 > 200 KiB）的上游版本
-  ├─ 2. 上游有更新 → 拉取新版、做语法校验与差异对比，判断改动属于优化还是回归
-  ├─ 3. 分析与优化：本地优化只针对 ≤ 200 KiB 的脚本（自有脚本可直接改；第三方仅做最小补丁）；> 200 KiB 只原样跟随上游
-  ├─ 4. 识别篡改猴中新增的脚本（读取最新导出文件或扩展存储），纳入本仓库
-  ├─ 5. 提升版本号、更新 README / CHANGELOG / manifest，提交到 GitHub
-  └─ 6. 篡改猴通过 @updateURL 检测到新版本 → 自动更新到本地
+每周定时触发（`.github/workflows/weekly-sync.yml`，每周一 02:00 UTC；也可在 Actions 页手动运行）
+  ├─ 1. tools/sync_upstream.py：读取 scripts-manifest.json，按 upstream_download 核对**全部脚本**（含 > 200 KiB）的上游 @version
+  ├─ 2. 上游有更新 → 拉取新版，校验脚本格式后重放 tools/optimizations.json 的补丁，并把版本号提升到严格大于当前仓库版本
+  ├─ 3. tools/apply_optimizations.py：重建 meta/*.meta.js、README、CHANGELOG，补齐 @grant 与失效依赖地址
+  ├─ 4. 自动提交并推送；篡改猴通过 @updateURL 检测到新版本 → 自动更新到本地
+  └─ 手动：新增脚本仍需从篡改猴导出，再运行 tools/build_from_export.py 纳入仓库
 ```
 
 **关于「优化」的边界（重要）**：
 
-- **上游检查覆盖全部脚本**，包括 Bilibili Evolved（1429 KB）与 LinkSwift（571 KB）；两者本周核对上游均为最新，无需同步。
-- **> 200 KiB 的脚本只跟随作者更新**：有新版时原样同步，不在本地改代码。当前适用：Bilibili Evolved（1429 KB）、LinkSwift（571 KB）。
+- **上游检查覆盖全部脚本**，包括 Bilibili Evolved（1429 KB）与 LinkSwift（571 KB）。
+- **> 200 KiB 的脚本只跟随作者更新**：有新版时原样同步，不在本地改代码。
 - **≤ 200 KiB 的脚本允许本地优化**：元数据修复（失效依赖地址、缺失 `@grant`、不安全资源地址）与最小代码补丁（`replace_code`），改后必须通过 `node --check`。
 - 每项改动都必须可外部验证（HTTP 状态码、具体代码行号），并记录在 `tools/optimizations.json` 与 CHANGELOG。
 - 优化以声明式补丁表保存，重建时自动重放，不会因从篡改猴重新导出而丢失。
@@ -50,7 +49,7 @@
 | 4 | [Github Enhancement - High Speed Download](#s4) | X.I.U | `2.6.42` | GitHub 增强 | 第三方 |
 | 5 | [AutoPager](#s5) | X.I.U | `6.6.76` | 通用浏览增强 | 第三方 |
 | 6 | [LinkSwift](#s6) | Hmjz100、油小猴 | `1.1.4` | 下载工具 | 第三方 |
-| 7 | [Bilibili Evolved](#s7) | Grant Howard, Coulomb-G | `2.12.1` | 站点增强 · 哔哩哔哩 | 第三方 |
+| 7 | [Bilibili Evolved](#s7) | Grant Howard, Coulomb-G | `2.12.2` | 站点增强 · 哔哩哔哩 | 第三方 |
 | 8 | [GitHub 中文化（最全翻译版）](#s8) | Yujan | `2.18.6` | GitHub 增强 | 第三方 |
 | 9 | [⭐网页瞬间加载/跳过进度条直接加载网页（附重定向链接优化）⭐](#s9) | fenda | `1.0.16` | 搜索与跳转 | 第三方 |
 | 10 | [【最强无套路脚本】你能看见多少我能下载多少&下载公开免费的PPT、PDF、DOC、TXT等文件](#s10) | Mr.Fang | `7.9` | 下载工具 | 第三方 |
@@ -83,7 +82,7 @@
 
 **本仓库处理**：代码主体原样归档，仅注入本仓库更新地址；后续由每周任务同步作者更新。
 
-**累计优化**（`0.7.1` → `0.7.3`，含图标 / 权限修复与更新地址迁移，代码主体零改动）：
+**本次优化**（`0.7.2` → `0.7.3`，仅改元数据，代码主体零改动）：
 
 - `@icon` —— `http://github.com/favicon.ico` → `https://github.com/favicon.ico`。图标为明文 http，在 https 页面属混合内容，可能被浏览器阻止加载。
 - 补声明 `@grant GM_info` —— 脚本第 448 行使用 const { name, version } = GM_info.script，但 @grant 未声明 GM_info。
@@ -115,7 +114,7 @@
 
 **本仓库处理**：代码主体原样归档，仅注入本仓库更新地址；后续由每周任务同步作者更新。
 
-**累计优化**（`27.20` → `27.22`，含资源 / 权限修复与更新地址迁移，代码主体零改动）：
+**本次优化**（`27.21` → `27.22`，仅改元数据，代码主体零改动）：
 
 - `@resource` `baiduLiteStyle` —— `https://gitcode.net/-/snippets/1906/raw/master/LiteStyle.css?inline=false` → `https://ibaidu.tujidu.com/newcss/baiduLiteStyle.less?t=27.20`。原地址实测 HTTP 404（GitCode 资源下线/迁移）。替代地址为作者自有服务器上同命名规律的等效资源：实测 HTTP 200、60226 字节、文件头标注 Title: baidu-lite、含 #wrapper/.c-container/.result 等百度页面选择器，与另外 22 个 @resource 同域名同版本参数。
 - 补声明 `@grant GM_info` —— 脚本第 405 行使用 GM_info.script.version，但 @grant 未声明 GM_info；在严格实现的管理器中该 API 不可用，会抛 TypeError。
@@ -243,7 +242,7 @@
 |----|------|
 | 文件 | [`scripts/Bilibili-Evolved.user.js`](scripts/Bilibili-Evolved.user.js) |
 | 作者 | Grant Howard, Coulomb-G |
-| 版本 | `2.12.1` |
+| 版本 | `2.12.2` |
 | 许可证 | MIT |
 | 分类 | 站点增强 · 哔哩哔哩 |
 | 匹配规则 | 1 条 `@match` / `@include` |
@@ -254,6 +253,12 @@
 **上游地址**：[项目/主页](https://github.com/the1812/Bilibili-Evolved) · [上游 meta](https://raw.githubusercontent.com/the1812/Bilibili-Evolved/master/dist/bilibili-evolved.user.js)
 
 **本仓库处理**：代码主体原样归档，仅注入本仓库更新地址；后续由每周任务同步作者更新。
+
+**本次优化**（`2.12.0` → `2.12.2`，仅改元数据，代码主体零改动）：
+
+- `@require` —— `https://raw.githubusercontent.com/lodash/lodash/4.17.21/dist/lodash.min.js#sha256=a9705dfc47c0763380d851ab1801be6f76019f6b67e40e9b873f8b4a0603f7a9` → `https://cdn.jsdelivr.net/npm/lodash@4.17.21/lodash.min.js#sha256=a9705dfc47c0763380d851ab1801be6f76019f6b67e40e9b873f8b4a0603f7a9`。raw.githubusercontent.com 在本机实测 HTTP 500（被墙），lodash 加载失败会导致篡改猴放弃注入整个脚本，表现为 Edge 中哔哩哔哩页面完全没有 Bilibili Evolved 面板。jsDelivr 镜像实测 HTTP 200，SHA-256 与 @require 声明的 a9705dfc… 完全一致，功能与校验强度不变。
+- `@icon` —— `https://raw.githubusercontent.com/the1812/Bilibili-Evolved/preview/images/logo-small.png` → `https://cdn.jsdelivr.net/gh/the1812/Bilibili-Evolved@preview/images/logo-small.png`。同域名被墙，图标 404/超时；仅影响脚本管理面板图标，换成 jsDelivr 镜像无副作用。
+- `@icon64` —— `https://raw.githubusercontent.com/the1812/Bilibili-Evolved/preview/images/logo.png` → `https://cdn.jsdelivr.net/gh/the1812/Bilibili-Evolved@preview/images/logo.png`。同上。
 
 **本仓库更新地址**：
 
@@ -270,7 +275,7 @@
 |----|------|
 | 文件 | [`scripts/GitHub-Zh-CN.user.js`](scripts/GitHub-Zh-CN.user.js) |
 | 作者 | Yujan |
-| 版本 | `2.18.6`（上游 `2.18.4` + 本地修复与地址迁移） |
+| 版本 | `2.18.6` |
 | 许可证 | GPL-3.0 |
 | 分类 | GitHub 增强 |
 | 匹配规则 | 5 条 `@match` / `@include` |
@@ -280,12 +285,7 @@
 
 **上游地址**：[项目/主页](https://greasyfork.org/scripts/602755) · [上游 meta](https://update.greasyfork.org/scripts/602755/GitHub%20%E4%B8%AD%E6%96%87%E5%8C%96%EF%BC%88%E6%9C%80%E5%85%A8%E7%BF%BB%E8%AF%91%E7%89%88%EF%BC%89.meta.js)
 
-**本仓库处理**：代码主体跟随上游归档，并应用一处最小本地补丁；后续由每周任务同步作者更新。
-
-**本次优化**（`2.18.4` → `2.18.6`）：
-
-- 搜索框守护改为只记录可信（`e.isTrusted`）的用户输入 —— 上游 2.18.4 只记录非中文输入，用户先输入英文、再输入中文时，中文会在 500ms 内被还原成旧值（第 3033–3054 行）。改为记录全部真实用户输入后，中文不再被误还原，脚本注入的中文仍会被还原。
-- `@updateURL` / `@downloadURL` 切到 jsDelivr CDN（本次全仓库统一迁移，见第一章）。
+**本仓库处理**：代码主体原样归档，仅注入本仓库更新地址；后续由每周任务同步作者更新。
 
 **本仓库更新地址**：
 
@@ -456,7 +456,7 @@
 
 ## 五、依赖与元数据健康检查
 
-2026-11-24 对全部脚本做的实测（只读检查，不改代码逻辑）：
+2026-11-23 对全部脚本做的实测（只读检查，不改代码逻辑）：
 
 | 检查项 | 覆盖范围 | 结果 |
 |--------|----------|------|
@@ -471,15 +471,11 @@
 
 **已知但本次有意不处理**：
 
-- **LinkSwift**：使用 GM_info 未声明 @grant —— 脚本 571 KB，超过 200 KiB 阈值，按约定不本地改代码，只跟随上游。
+- **LinkSwift**：同样使用 GM_info 未声明 @grant —— 脚本 571 KB，超过 200 KiB 阈值，按约定不做改动。
 - **CSDNGreener**：@require 的 jquery-cookie、nprogress 在代码中未检出使用 —— 检测方法存在假阴性风险（已在 AC-baidu 的 Vue 依赖上验证过误判），删除依赖收益（省 2 个请求）低于误删导致功能损坏的风险，按「保证功能完整」原则保留。
 
-**本轮本地代码补丁（≤ 200 KiB 脚本）**：
-
-- **GitHub 中文化 `2.18.4` → `2.18.6`**：上游 2.18.4 的搜索框守护只记录非中文输入，先输入英文再输入中文时，中文会在 500ms 内被还原成旧值。改为只信任用户真实输入（`e.isTrusted`）后，中文会更新基准值，脚本注入的中文仍会被还原。补丁以 `replace_code` 记录在 `tools/optimizations.json`，重建时自动重放。
-
 **检查更新的流量优化**：`meta/*.meta.js` 只用于篡改猴比对 `@version`，已剔除 data URI 图标、`@resource`、`@note` 等与版本判断无关的字段。
-当前 14 个 meta 文件合计 **40.6 KB**（精简前约 100 KB），每次「检查更新」少下载约 60 KB。
+当前 14 个 meta 文件合计 **41.3 KB**（精简前约 100 KB），每次「检查更新」少下载约 60 KB。
 
 ## 六、脚本共存与冲突排查
 
