@@ -1,7 +1,7 @@
 {
   "_note": "脚本优化补丁表。build_from_export.py / apply_optimizations.py 重建与同步时自动重放，避免从篡改猴重新导出后丢失。仅允许对不超过 200 KiB 的脚本改元数据（replace_meta / add_grant）与做最小代码补丁（replace_code）；> 200 KiB 的脚本只跟随上游、不改代码。",
   "version": 1,
-  "updated_at": "2026-11-25",
+  "updated_at": "2026-11-26",
   "policy": {
     "large_script_threshold_bytes": 204800,
     "large_script_note": "字节数 > 204800（200 KiB）视为大型成熟项目：每周仍核对上游版本，有更新则原样同步，但不在本地修改代码。",
@@ -43,7 +43,9 @@
           "reason": "原地址实测 HTTP 404（GitCode 资源下线/迁移）。替代地址为作者自有服务器上同命名规律的等效资源：实测 HTTP 200、60226 字节、文件头标注 Title: baidu-lite、含 #wrapper/.c-container/.result 等百度页面选择器，与另外 22 个 @resource 同域名同版本参数。"
         }
       ],
-      "add_grant": ["GM_info"],
+      "add_grant": [
+        "GM_info"
+      ],
       "grant_reason": "脚本第 405 行使用 GM_info.script.version，但 @grant 未声明 GM_info；在严格实现的管理器中该 API 不可用，会抛 TypeError。"
     },
     "GitHub-Plus": {
@@ -56,7 +58,9 @@
           "reason": "图标为明文 http，在 https 页面属混合内容，可能被浏览器阻止加载。"
         }
       ],
-      "add_grant": ["GM_info"],
+      "add_grant": [
+        "GM_info"
+      ],
       "grant_reason": "脚本第 448 行使用 const { name, version } = GM_info.script，但 @grant 未声明 GM_info。"
     },
     "GitHub-Zh-CN": {
@@ -69,11 +73,45 @@
           "reason": "上游 2.18.4 的搜索框守护只记录非中文输入：用户先输入英文、再输入中文时，中文会在 500ms 内被还原为旧值（脚本第 3033–3054 行）。改为只信任用户真实输入（e.isTrusted）后，中文输入会更新基准值，而脚本注入的中文仍会被还原。"
         }
       ]
+    },
+    "Bilibili-Unlock-Dolby-8K-HDR": {
+      "version_bump": "2.7.1.1.14",
+      "replace_meta": [
+        {
+          "field": "icon",
+          "old": "https://www.google.com/s2/favicons?domain=bilibili.com",
+          "new": "https://www.bilibili.com/favicon.ico",
+          "reason": "Google 的 s2 favicon 接口在国内网络常不可达，管理面板图标长期加载失败；改用 B站官方 favicon（实测 HTTP 200），去掉第三方依赖。"
+        }
+      ],
+      "replace_code": [
+        {
+          "name": "strict-directive-and-localstorage-guard",
+          "old": "(function() {\n    window.localStorage['bilibili_player_force_DolbyAtmos&8K&HDR'] = 1;\n    // B站內置強制開關\n    window.localStorage.bilibili_player_force_hdr = 1;\n    'use strict'",
+          "new": "(function () {\n    'use strict';\n\n    // B站播放器内置强制开关（等价于在设置里手动开启杜比全景声 / HDR）\n    try {\n        localStorage['bilibili_player_force_DolbyAtmos&8K&HDR'] = 1;\n        localStorage.bilibili_player_force_hdr = 1;\n    } catch (e) {\n        // 隐私模式或站点数据被禁用时 localStorage 写入会抛异常，忽略即可\n    }\n",
+          "reason": "原脚本把 'use strict' 放在两条语句之后，此时它不是指令、严格模式并未生效；同时 document-start 阶段在隐私模式或禁用站点数据时写 localStorage 会抛 SecurityError 中断整个脚本，改为指令置顶并加 try/catch。"
+        },
+        {
+          "name": "hevc-hook-rename-and-guard",
+          "old": "    const originalSetItem = sessionStorage.getItem;\n    sessionStorage.getItem = function(key) {\n        // 部分視頻解碼錯誤後會強制全局回退，禁用所有HEVC內容\n        // 此hook禁用對應邏輯\n        if (key === 'enableHEVCError') {\n            return undefined;\n        }\n        return originalSetItem.apply(this,arguments);\n    };",
+          "new": "    // 部分视频解码失败后，B站会写入 enableHEVCError 并全局回退、禁用所有 HEVC 内容；\n    // 这里拦截该标记的读取来跳过回退逻辑，并带标记避免重复包装。\n    try {\n        var rawGetItem = sessionStorage.getItem;\n        if (!rawGetItem.__hevcHook) {\n            var hookedGetItem = function (key) {\n                if (key === 'enableHEVCError') {\n                    return undefined;\n                }\n                return rawGetItem.apply(this, arguments);\n            };\n            hookedGetItem.__hevcHook = true;\n            sessionStorage.getItem = hookedGetItem;\n        }\n    } catch (e) {\n        // sessionStorage 不可用时跳过\n    }\n",
+          "reason": "变量名 originalSetItem 实际保存的是 getItem；另外每次注入都会在本已包装过的 getItem 上再包一层，加上 __hevcHook 标记后只包装一次，并同样用 try/catch 兜底。"
+        },
+        {
+          "name": "ua-defineProperty-configurable",
+          "old": "    Object.defineProperty(navigator, 'userAgent', {\n        value: \"Mozilla/5.0 (Macintosh; Intel Mac OS X 15_8_3) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/27.0 Safari/605.1.15\"\n    });",
+          "new": "    // 把 UA 伪装成 macOS Safari，让 B站网页播放器下发杜比 / 8K 等桌面端受限档位。\n    // configurable 必须为 true：否则页面或其它脚本再次定义 navigator.userAgent 时会抛 TypeError。\n    try {\n        Object.defineProperty(navigator, 'userAgent', {\n            configurable: true,\n            value: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 15_8_3) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/27.0 Safari/605.1.15'\n        });\n    } catch (e) {\n        // 个别环境不允许重定义 navigator 属性，忽略\n    }",
+          "reason": "原定义未设置 configurable，navigator.userAgent 变为不可再定义属性，页面或其他脚本（如 Bilibili Evolved）二次定义时会抛 TypeError；补 configurable:true 并加 try/catch。"
+        }
+      ]
     }
   },
   "meta_slim": {
     "enabled": true,
-    "drop_fields": ["resource", "note"],
+    "drop_fields": [
+      "resource",
+      "note"
+    ],
     "drop_data_uri_icon": true,
     "reason": "meta.js 仅用于篡改猴比对 @version。剔除 data URI 图标、@resource、@note 等与版本判断无关的大字段，可把检查更新的累计流量从约 110 KB 降到约 25 KB，且不影响更新判定。"
   },

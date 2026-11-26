@@ -2,6 +2,17 @@
 
 每周自动任务会在此追加记录：上游版本变化、优化项、新增/移除脚本。
 
+## 2026-11-26 — 新增 Bilibili 杜比/8K/HDR 解锁脚本
+
+- **新增**：`Bilibili-Unlock-Dolby-8K-HDR`（AlexLI(tkp206093)，上游 GreasyFork 441403），仓库脚本数 14 → 15。`@namespace` / `@name` 保持原样，覆盖安装不会丢失原有设置；版本号提升为 `2.7.1.1.14`（上游 `2.7.1.1.13`），以便篡改猴把仓库版本识别为更新。
+- **元数据**：`@icon` 由 `https://www.google.com/s2/favicons?domain=bilibili.com` 改为 `https://www.bilibili.com/favicon.ico`。Google 的 s2 favicon 接口国内常不可达，图标长期加载失败，改为 B站官方图标后无第三方依赖。
+- **代码补丁**（脚本 3.8 KB，≤ 200 KiB，已通过 `node --check`）：
+  - `'use strict'` 移到 IIFE 顶部 —— 原位置在两条语句之后，此时它不是指令，严格模式实际并未生效。
+  - `localStorage` 写入加 `try/catch` —— document-start 阶段在隐私模式或禁用站点数据时会抛 `SecurityError`，原脚本会整体中断。
+  - HEVC 回退钩子 —— `originalSetItem` 改名为 `originalGetItem`（原名实际保存的是 `getItem`）；新增 `__hevcHook` 标记，避免重复注入时层层包装；补 `sessionStorage` 不可用时的兜底。
+  - `navigator.userAgent` 覆盖 —— 补 `configurable: true` 与 `try/catch`。原定义不可再次定义，页面或其他脚本（如 Bilibili Evolved）二次定义时会抛 `TypeError`。
+- **声明式记录**：以上补丁写入 `tools/optimizations.json`，从篡改猴重新导出或每周同步上游时会自动重放。
+
 ## 2026-11-25 — 第三方脚本元数据审查与优化
 
 按「> 200 KiB 视为大型脚本、只跟随上游不改代码」的阈值，对 12 个第三方脚本做了依赖与元数据的实证检查（HTTP 实测 + 代码行号比对）。

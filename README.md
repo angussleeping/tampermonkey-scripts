@@ -3,8 +3,8 @@
 > 集中保存我在篡改猴（Tampermonkey）中使用的全部用户脚本，统一托管更新地址，并由每周自动任务检查上游版本、分析与优化后回写本仓库。
 
 - **仓库**：[angussleeping/tampermonkey-scripts](https://github.com/angussleeping/tampermonkey-scripts)
-- **脚本数量**：14 个（12 个第三方 / 2 个自有）
-- **最近同步**：2026-11-25
+- **脚本数量**：15 个（13 个第三方 / 2 个自有）
+- **最近同步**：2026-11-26
 
 ---
 
@@ -57,6 +57,7 @@
 | 12 | [骚扰拦截](#s12) | airbash | `1.5.10` | 通用浏览增强 | 第三方 |
 | 13 | [微博：按时间排序 + 屏蔽荐读并补齐空位](#s13) | WorkBuddy | `1.0.2` | 站点增强 · 微博 | 自有 |
 | 14 | [知乎去广告 + 沉浸模式（精简优化版）](#s14) | shawn (原作) / 精简优化 | `2.1.2` | 站点增强 · 知乎 | 自有 |
+| 15 | [Bilibili 解鎖杜比全景聲 & 8K & 開啟 HDR & 直播畫質PRO](#s15) | AlexLI(tkp206093) | `2.7.1.1.14` | 站点增强 · 哔哩哔哩 | 第三方 |
 
 ---
 
@@ -452,6 +453,41 @@
 下载代码 (@downloadURL) : https://cdn.jsdelivr.net/gh/angussleeping/tampermonkey-scripts@master/scripts/Zhihu-AdClean-Focus.user.js
 ```
 
+<a id="s15"></a>
+
+### 15. Bilibili 解鎖杜比全景聲 & 8K & 開啟 HDR & 直播畫質PRO
+
+| 项 | 内容 |
+|----|------|
+| 文件 | [`scripts/Bilibili-Unlock-Dolby-8K-HDR.user.js`](scripts/Bilibili-Unlock-Dolby-8K-HDR.user.js) |
+| 作者 | AlexLI(tkp206093) |
+| 版本 | `2.7.1.1.14` |
+| 许可证 | MIT |
+| 分类 | 站点增强 · 哔哩哔哩 |
+| 匹配规则 | 11 条 `@match` / `@include` |
+| 来源 | 第三方 |
+
+**作用**：为 B 站 Windows 网页端解锁杜比全景声、8K 与 HDR，并解锁直播画质 PRO。
+
+**上游地址**：[项目/主页](https://greasyfork.org/zh-TW/scripts/441403) · [上游 meta](https://update.greasyfork.org/scripts/441403/Bilibili%20%E8%A7%A3%E9%8E%96%E6%9D%9C%E6%AF%94%E5%85%A8%E6%99%AF%E8%81%B2%20%208K%20%20%E9%96%8B%E5%95%9F%20HDR%20%20%E7%9B%B4%E6%92%AD%E7%95%AB%E8%B3%AAPRO.meta.js)
+
+**本仓库处理**：代码主体原样归档，仅注入本仓库更新地址；本次按 ≤ 200 KiB 规则做了元数据修复与最小代码补丁，后续由每周任务同步作者更新。
+
+**本次优化**（`2.7.1.1.13` → `2.7.1.1.14`）：
+
+- `@icon` —— `https://www.google.com/s2/favicons?domain=bilibili.com` → `https://www.bilibili.com/favicon.ico`。Google 的 s2 favicon 接口国内常不可达，管理面板图标长期加载失败；改用 B站官方图标，去掉第三方依赖。
+- `'use strict'` 位置 —— 原脚本把它放在两条语句之后，此时它不是指令、严格模式并未生效；已移到 IIFE 顶部。
+- `localStorage` 写入加 `try/catch` —— document-start 阶段在隐私模式或禁用站点数据时写 localStorage 会抛 `SecurityError`，原脚本会整体中断；包裹后其余功能照常生效。
+- HEVC 回退钩子 —— 变量名 `originalSetItem` 实际保存的是 `getItem`；并增加 `__hevcHook` 标记避免页面重复注入时层层包装，同时补 `sessionStorage` 不可用时的兜底。
+- `navigator.userAgent` 覆盖 —— 补 `configurable: true` 与 `try/catch`。原定义未设置 configurable，该属性将不可再次定义，页面或其他脚本（如 Bilibili Evolved）二次定义时会抛 `TypeError`。
+
+**本仓库更新地址**：
+
+```
+检查更新 (@updateURL)   : https://cdn.jsdelivr.net/gh/angussleeping/tampermonkey-scripts@master/meta/Bilibili-Unlock-Dolby-8K-HDR.meta.js
+下载代码 (@downloadURL) : https://cdn.jsdelivr.net/gh/angussleeping/tampermonkey-scripts@master/scripts/Bilibili-Unlock-Dolby-8K-HDR.user.js
+```
+
 ---
 
 ## 五、依赖与元数据健康检查
@@ -475,7 +511,7 @@
 - **CSDNGreener**：@require 的 jquery-cookie、nprogress 在代码中未检出使用 —— 检测方法存在假阴性风险（已在 AC-baidu 的 Vue 依赖上验证过误判），删除依赖收益（省 2 个请求）低于误删导致功能损坏的风险，按「保证功能完整」原则保留。
 
 **检查更新的流量优化**：`meta/*.meta.js` 只用于篡改猴比对 `@version`，已剔除 data URI 图标、`@resource`、`@note` 等与版本判断无关的字段。
-当前 14 个 meta 文件合计 **41.3 KB**（精简前约 100 KB），每次「检查更新」少下载约 60 KB。
+当前 15 个 meta 文件合计 **43.4 KB**（精简前约 100 KB），每次「检查更新」少下载约 60 KB。
 
 ## 六、脚本共存与冲突排查
 
@@ -488,7 +524,7 @@
 | `baidu.com` | AC-baidu-Redirect、Annoyances-Interception、LinkSwift、Universal-Downloader |
 | `github.com` | GitHub-Plus、GitHub-Zh-CN、Github-Enhancement-High-Speed-Download |
 | `quark.cn` | Annoyances-Interception、LinkSwift、Universal-Downloader |
-| `bilibili.com` | Annoyances-Interception、Bilibili-Evolved |
+| `bilibili.com` | Annoyances-Interception、Bilibili-Evolved、Bilibili-Unlock-Dolby-8K-HDR |
 | `csdn.net` | Annoyances-Interception、CSDNGreener |
 | `qq.com` | Annoyances-Interception、Universal-Downloader |
 | `so.com` | AC-baidu-Redirect、Universal-Downloader |
@@ -526,8 +562,9 @@
 | 【最强无套路脚本】你能看见多少我能下载多少&下载公开免费的PPT、PDF、DOC、TXT等文件 | **Mr.Fang** | [链接](https://greasyfork.org/scripts/486211) |
 | 「CSDNGreener」🍃CSDN广告完全过滤\|免登录\|个性化排版\|最强老牌脚本\|持续更新 | **Adler** | [链接](https://greasyfork.org/scripts/378351) |
 | 骚扰拦截 | **airbash** | [链接](https://github.com/AirBashX/UserScript) |
+| Bilibili 解鎖杜比全景聲 & 8K & 開啟 HDR & 直播畫質PRO | **AlexLI(tkp206093)** | [链接](https://greasyfork.org/zh-TW/scripts/441403) |
 
-**作者名单（去重）**：**PRO-2684**、**AC**、**极品小猫**、**X.I.U**、**Hmjz100、油小猴**、**Grant Howard, Coulomb-G**、**Yujan**、**fenda**、**Mr.Fang**、**Adler**、**airbash**。
+**作者名单（去重）**：**PRO-2684**、**AC**、**极品小猫**、**X.I.U**、**Hmjz100、油小猴**、**Grant Howard, Coulomb-G**、**Yujan**、**fenda**、**Mr.Fang**、**Adler**、**airbash**、**AlexLI(tkp206093)**。
 
 另有 2 个脚本由 WorkBuddy 辅助生成 / 优化（微博：按时间排序 + 屏蔽荐读并补齐空位、知乎去广告 + 沉浸模式（精简优化版）），基于 shawn 等原作者的开源作品二次改进。
 

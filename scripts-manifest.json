@@ -5,8 +5,8 @@
   "meta_base": "https://cdn.jsdelivr.net/gh/angussleeping/tampermonkey-scripts@master/meta/",
   "repo_url": "https://github.com/angussleeping/tampermonkey-scripts",
   "export_source": "篡改猴脚本集合.txt",
-  "generated_at": "2026-11-25",
-  "script_count": 14,
+  "generated_at": "2026-11-26",
+  "script_count": 15,
   "scripts": [
     {
       "file": "GitHub-Plus.user.js",
@@ -437,6 +437,62 @@
       "meta_bytes": 1291,
       "oversize": false,
       "version_bumped_from": "2.1.1"
+    },
+    {
+      "file": "Bilibili-Unlock-Dolby-8K-HDR.user.js",
+      "meta_file": "Bilibili-Unlock-Dolby-8K-HDR.meta.js",
+      "name": "Bilibili 解鎖杜比全景聲 & 8K & 開啟 HDR & 直播畫質PRO",
+      "author": "AlexLI(tkp206093)",
+      "version": "2.7.1.1.14",
+      "original_version": "2.7.1.1.13",
+      "license": "MIT",
+      "category": "站点增强 · 哔哩哔哩",
+      "summary": "为 B 站 Windows 网页端解锁杜比全景声、8K 与 HDR，并解锁直播画质 PRO。",
+      "origin": "third_party",
+      "enabled": true,
+      "size_bytes": 3865,
+      "meta_bytes": 2155,
+      "upstream_meta": "https://update.greasyfork.org/scripts/441403/Bilibili%20%E8%A7%A3%E9%8E%96%E6%9D%9C%E6%AF%94%E5%85%A8%E6%99%AF%E8%81%B2%20%208K%20%20%E9%96%8B%E5%95%9F%20HDR%20%20%E7%9B%B4%E6%92%AD%E7%95%AB%E8%B3%AAPRO.meta.js",
+      "upstream_download": "https://update.greasyfork.org/scripts/441403/Bilibili%20%E8%A7%A3%E9%8E%96%E6%9D%9C%E6%AF%94%E5%85%A8%E6%99%AF%E8%81%B2%20%208K%20%20%E9%96%8B%E5%95%9F%20HDR%20%20%E7%9B%B4%E6%92%AD%E7%95%AB%E8%B3%AAPRO.user.js",
+      "upstream_page": "https://greasyfork.org/zh-TW/scripts/441403",
+      "file_url": "https://greasyfork.org/zh-TW/scripts/441403",
+      "supportURL": "https://greasyfork.org/zh-TW/scripts/441403/feedback",
+      "match_count": 11,
+      "namespace": "https://greasyfork.org/zh-TW/users/150638-tkp206093",
+      "version_normalized": false,
+      "version_bumped_from": "2.7.1.1.13",
+      "optimized": true,
+      "optimizations": [
+        {
+          "field": "icon",
+          "name": "",
+          "old": "https://www.google.com/s2/favicons?domain=bilibili.com",
+          "new": "https://www.bilibili.com/favicon.ico",
+          "reason": "Google 的 s2 favicon 接口在国内网络常不可达，图标长期加载失败；改用 B站官方 favicon（实测 HTTP 200），去掉第三方依赖。"
+        },
+        {
+          "field": "code",
+          "name": "strict-directive-and-localstorage-guard",
+          "old": "localStorage 直接写入、'use strict' 位于语句之后",
+          "new": "strict 指令置顶 + try/catch 包裹 localStorage 写入",
+          "reason": "严格模式此前并未生效；隐私模式下写 localStorage 会抛 SecurityError 中断整个脚本。"
+        },
+        {
+          "field": "code",
+          "name": "hevc-hook-rename-and-guard",
+          "old": "const originalSetItem（实为 getItem）；每次注入重复包装",
+          "new": "originalGetItem + __hevcHook 标记，仅包装一次",
+          "reason": "变量名与实际不符；重复包装会让 getItem 调用链变长，且缺少 sessionStorage 不可用时的兜底。"
+        },
+        {
+          "field": "code",
+          "name": "ua-defineProperty-configurable",
+          "old": "Object.defineProperty(navigator,'userAgent',{value})",
+          "new": "补 configurable:true 并用 try/catch 包裹",
+          "reason": "原定义不可再次定义，页面或其他脚本（如 Bilibili Evolved）二次定义 navigator.userAgent 时会抛 TypeError。"
+        }
+      ],
+      "oversize": false
     }
   ],
   "large_script_threshold_bytes": 204800,
@@ -475,7 +531,8 @@
         "site": "bilibili.com",
         "scripts": [
           "Annoyances-Interception",
-          "Bilibili-Evolved"
+          "Bilibili-Evolved",
+          "Bilibili-Unlock-Dolby-8K-HDR"
         ]
       },
       {
